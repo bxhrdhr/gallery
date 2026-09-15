@@ -8,7 +8,7 @@ var CFG = {
   "name": "时光图库",
   "intro": "一座小小的图库，收藏生活的风景与故事。",
   "pageMode": "ksx",
-  "uiTitle": "TIME GALLERY",
+  "uiTitle": "SHIGUANG GALLERY",
   "uiSub": "时光图库",
   "bg": "forest",
   "bgAuto": false,
@@ -146,14 +146,6 @@ var CFG = {
 var ASSET_BASE = '../';   /* 本站资源：相对路径（本页在 template/ 下，上一级即仓库根） */
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>/* 站点图标跟随资源基准，本地打开时不再请求外链 */
-(function () {
-    ['shortcut icon', 'icon'].forEach(function (rel) {
-        var l = document.createElement('link');
-        l.rel = rel; l.type = 'image/x-icon'; l.href = ASSET_BASE + 'logo/favicon.ico';
-        document.head.appendChild(l);
-    });
-})();</script>
 <title>时光图库</title>
 <meta name="description" content="一座小小的图库，收藏生活的风景与故事。">
 <meta property="og:title" content="时光图库">
@@ -791,7 +783,7 @@ body.intro-lock { overflow: hidden; }
 <div id="bgTpl"></div>
 <div class="noise"></div>
 <div class="header">
-    <div class="title">TIME GALLERY</div>
+    <div class="title">SHIGUANG GALLERY</div>
     <div class="subtitle">时光图库</div>
 </div>
 <div class="catbar" id="catbar"></div>
@@ -1066,11 +1058,11 @@ body.intro-lock { overflow: hidden; }
         });
         if(t[c] && 'mediaSession' in navigator){
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: t[c].n, artist: 'KSX ZH',
+                title: t[c].n, artist: '时光图库',
                 artwork: [{ 
-  src: ASSET_BASE + 'logo/favicon.ico', 
-  sizes: '192x192', 
-  type: 'image/x-icon' 
+  src: ASSET_BASE + 'img/demo1.jpg', 
+  sizes: '2160x1440', 
+  type: 'image/jpeg' 
 }]
 
             });
@@ -1127,11 +1119,11 @@ body.intro-lock { overflow: hidden; }
         u.src = t[0].u; 
         if('mediaSession' in navigator){
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: t[0].n, artist: 'KSX ZH',
+                title: t[0].n, artist: '时光图库',
                 artwork: [{ 
-  src: ASSET_BASE + 'logo/favicon.ico', 
-  sizes: '192x192', 
-  type: 'image/x-icon' 
+  src: ASSET_BASE + 'img/demo1.jpg', 
+  sizes: '2160x1440', 
+  type: 'image/jpeg' 
 }]
             });
         }
