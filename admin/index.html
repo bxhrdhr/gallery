@@ -165,7 +165,7 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
         <div class="lbl">前台使用哪套页面</div>
         <div class="pg-mode">
             <label><input type="radio" name="pageMode" value="gallery"> 时光图库（默认）</label>
-            <label><input type="radio" name="pageMode" value="ksx"> 旧站页面（内容与 woain.cc.cd 同步）</label>
+            <label><input type="radio" name="pageMode" value="ksx"> 旧站风格（布局用旧站，内容与时光图库同步）</label>
         </div>
         <div class="btn-row"><button class="btn primary" id="btnSaveMode" type="button">保存页面切换</button></div>
         <div style="font-size:11px;color:var(--dim);">切换后等 1-2 分钟部署生效，前台刷新即可看到。</div>
@@ -279,8 +279,18 @@ function saveIdx(cb) {
     var html = buildCfg();
     api('/contents/index.html', 'PUT', { message: 'Sync 图库', content: bE(html), sha: idxSha }).then(function (r) {
         idxSha = r.content.sha; idxHtml = html;
-        msg('已保存');
-        if (cb) cb();
+        /* 同步页面切换模板：旧站模板使用同一份配置（内容与时光图库一致） */
+        var tplCfg = 'var CFG = ' + JSON.stringify(cfg, null, 2) + ';\nvar ASSET_BASE';
+        api('/contents/template/ksx.html').then(function (tr) {
+            var ntpl = bD(tr.content).replace(/var CFG = [\s\S]*?;\s*var ASSET_BASE/, tplCfg);
+            return api('/contents/template/ksx.html', 'PUT', { message: 'Sync 模板', content: bE(ntpl), sha: tr.sha });
+        }).then(function () {
+            msg('已保存');
+            if (cb) cb();
+        }).catch(function () {
+            msg('已保存（模板同步失败，请稍后重试）');
+            if (cb) cb();
+        });
     }).catch(function () { msg('保存失败，请重试'); });
 }
 
