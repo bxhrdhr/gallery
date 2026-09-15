@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>图库管理后台</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root { --bg:#0f1220; --card:#1a1f33; --card2:#222842; --ink:#e8ebf7; --dim:#8b93b8; --accent:#8b9cf0; --accent2:#c9a2e8; --danger:#ff7d8c; --safe:#6fd3a8; --line:rgba(150,165,220,.14); }
+html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; min-height:100vh; }
+body { padding-bottom:84px; }
+input, textarea, select, button { font-family:inherit; }
+.hd { position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:rgba(15,18,32,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+.hd h1 { margin:0; font-size:16px; font-weight:600; letter-spacing:.12em; }
+.hd .sub { font-size:11px; color:var(--dim); letter-spacing:.18em; margin-top:2px; }
+.icon-btn { background:var(--card2); border:1px solid var(--line); color:var(--dim); width:36px; height:36px; border-radius:12px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; }
+.panel { display:none; padding:74px 14px 20px; }
+.panel.on { display:block; }
+.sec { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:14px; }
+.sec h3 { margin:0 0 10px; font-size:13px; letter-spacing:.12em; color:var(--accent); }
+input[type=text], input[type=password], input[type=file], textarea, select {
+    width:100%; background:var(--card2); border:1px solid var(--line); color:var(--ink);
+    border-radius:12px; padding:11px 12px; font-size:14px; outline:none; margin:4px 0;
+}
+input:focus, textarea:focus, select:focus { border-color:var(--accent); }
+textarea { min-height:80px; line-height:1.6; resize:vertical; }
+.btn {
+    display:inline-block; border:none; border-radius:12px; padding:11px 22px; cursor:pointer;
+    font-size:14px; letter-spacing:.1em; background:var(--card2); color:var(--ink); border:1px solid var(--line);
+}
+.btn.primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; }
+.btn.danger { background:rgba(255,125,140,.14); color:var(--danger); border:1px solid rgba(255,125,140,.4); }
+.btn.sm { padding:7px 14px; font-size:12px; border-radius:10px; }
+.btn-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.lbl { font-size:11px; color:var(--dim); margin:10px 0 2px; letter-spacing:.14em; }
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+@media(min-width:640px){ .grid { grid-template-columns:repeat(4,1fr); } }
+.tile { position:relative; border-radius:14px; overflow:hidden; background:var(--card2); border:1px solid var(--line); }
+.tile img { width:100%; height:120px; object-fit:cover; display:block; }
+.tile .nm { padding:7px 8px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tile .tag { position:absolute; top:6px; left:6px; font-size:10px; padding:3px 8px; border-radius:99px; background:rgba(0,0,0,.55); color:#fff; }
+.tile .sel { position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; border:2px solid #fff; background:transparent; }
+.tile.sel .sel { background:#4c9aff; }
+.menu { position:fixed; left:0; right:0; bottom:0; z-index:200; background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px; padding:10px 16px calc(12px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform .28s ease; box-shadow:0 -8px 30px rgba(0,0,0,.5); }
+.menu.show { transform:translateY(0); }
+.menu .mi { padding:13px 10px; font-size:14px; letter-spacing:.06em; border-bottom:1px solid var(--line); cursor:pointer; }
+.menu .mi:last-child { border-bottom:none; }
+.menu .mi.danger { color:var(--danger); }
+.mask { position:fixed; inset:0; z-index:150; background:rgba(0,0,0,.55); display:none; }
+.mask.show { display:block; }
+.sheet { position:fixed; inset:0; z-index:210; background:rgba(6,8,16,.7); display:none; align-items:flex-end; justify-content:center; }
+.sheet.show { display:flex; }
+.sheet .box { width:100%; max-width:520px; background:var(--card); border-radius:22px 22px 0 0; padding:20px 18px calc(18px + env(safe-area-inset-bottom)); max-height:82vh; overflow-y:auto; }
+.sheet .box h3 { margin:0 0 12px; font-size:15px; color:var(--accent); letter-spacing:.1em; }
+.nav { position:fixed; bottom:0; left:0; right:0; height:64px; background:#0d101c; border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; z-index:50; }
+.nav button { background:none; border:none; color:var(--dim); font-size:10px; letter-spacing:.06em; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.nav button.on { color:var(--accent); }
+.nav svg { width:22px; height:22px; }
+#toast { position:fixed; top:64px; left:50%; transform:translateX(-50%); z-index:300; background:#2a3050; color:#fff; padding:10px 22px; border-radius:99px; font-size:13px; letter-spacing:.06em; display:none; box-shadow:0 8px 26px rgba(0,0,0,.4); }
+.opt { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); }
+.opt:last-child { border-bottom:none; }
+.opt .nm2 { flex:1; font-size:13px; }
+.bg-card { border:2px solid transparent; border-radius:16px; padding:10px; margin-bottom:10px; cursor:pointer; background:var(--card2); }
+.bg-card.on { border-color:var(--accent); }
+.bg-prev { height:74px; border-radius:12px; margin-bottom:8px; }
+.switch { position:relative; width:46px; height:26px; border-radius:99px; background:var(--card2); border:1px solid var(--line); cursor:pointer; flex-shrink:0; }
+.switch i { position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#888; transition:all .2s ease; }
+.switch.on { background:rgba(107,145,240,.35); border-color:var(--accent); }
+.switch.on i { left:22px; background:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="hd">
+    <div>
+        <h1 id="hdTitle">图库管理</h1>
+        <div class="sub" id="hdRepo">未连接</div>
+    </div>
+    <button class="icon-btn" id="hdRefresh" type="button">↻</button>
+</div>
+<div id="toast"></div>
+
+<!-- 登录 -->
+<div class="sheet show" id="loginSheet">
+    <div class="box" style="text-align:center;">
+        <h3>图库管理后台</h3>
+        <div style="font-size:12px; color:var(--dim); margin:6px 0 14px; letter-spacing:.1em;">输入 GitHub 令牌登录</div>
+        <input type="password" id="tk" placeholder="GitHub 令牌（ghp_...）">
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--dim); margin:8px 0;">
+            <input type="checkbox" id="rem" style="width:auto;"> 记住令牌（下次免输）
+        </label>
+        <div class="btn-row" style="justify-content:center;">
+            <button class="btn primary" id="btnLogin" type="button" style="width:100%;">安全登录</button>
+        </div>
+        <div style="font-size:11px; color:var(--dim); margin-top:14px; line-height:1.8;">令牌在 GitHub → Settings → Developer settings →<br>Personal access tokens 生成，勾选 repo 权限即可。</div>
+    </div>
+</div>
+
+<!-- 图片 -->
+<div class="panel on" id="p-img">
+    <div class="sec">
+        <div class="btn-row">
+            <button class="btn primary" id="btnUp" type="button">上传图片</button>
+            <button class="btn" id="btnCats" type="button">管理分类</button>
+            <button class="btn" id="btnMulti" type="button">多选</button>
+        </div>
+        <input type="file" id="upFiles" accept="image/*" multiple style="display:none;">
+        <div class="lbl">当前分类</div>
+        <select id="upCat"></select>
+    </div>
+    <div class="sec">
+        <h3>图片列表（点击操作）</h3>
+        <div class="grid" id="imgGrid"></div>
+        <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="imgEmpty">加载中...</div>
+        <div class="btn-row" id="multiBar" style="display:none;">
+            <button class="btn danger" id="btnMDel" type="button">删除所选</button>
+            <button class="btn" id="btnMMove" type="button">移动到分类</button>
+            <button class="btn" id="btnMCancel" type="button">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 音频 -->
+<div class="panel" id="p-audio">
+    <div class="sec">
+        <div class="btn-row">
+            <button class="btn primary" id="btnUpA" type="button">上传音乐</button>
+        </div>
+        <input type="file" id="upFilesA" accept="audio/*" multiple style="display:none;">
+    </div>
+    <div class="sec">
+        <h3>音乐列表（点击操作）</h3>
+        <div id="audioList"></div>
+        <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="audioEmpty">加载中...</div>
+    </div>
+</div>
+
+<!-- 背景 -->
+<div class="panel" id="p-bg">
+    <div class="sec">
+        <h3>选择背景（前台即时生效）</h3>
+        <div id="bgList"></div>
+    </div>
+</div>
+
+<!-- 设置 -->
+<div class="panel" id="p-set">
+    <div class="sec">
+        <h3>基本设置</h3>
+        <div class="lbl">网站名称（浏览器标题）</div>
+        <input type="text" id="set-name">
+        <div class="lbl">网站介绍（搜索简介）</div>
+        <textarea id="set-intro"></textarea>
+        <div class="lbl">顶部小字（字母）</div>
+        <input type="text" id="set-uiTitle">
+        <div class="lbl">品牌名</div>
+        <input type="text" id="set-uiSub">
+        <div class="btn-row"><button class="btn primary" id="btnSaveBase" type="button">保存基本设置</button></div>
+    </div>
+    <div class="sec">
+        <h3>首页横幅文字</h3>
+        <div class="lbl">眉标（小字）</div>
+        <input type="text" id="set-eyebrow">
+        <div class="lbl">大标题</div>
+        <input type="text" id="set-title">
+        <div class="lbl">副标题</div>
+        <input type="text" id="set-sub">
+        <div class="lbl">按钮文字</div>
+        <input type="text" id="set-cta">
+        <div class="btn-row"><button class="btn primary" id="btnSaveHero" type="button">保存横幅文字</button></div>
+    </div>
+    <div class="sec">
+        <h3>404 页面文字</h3>
+        <div class="lbl">页签标题</div>
+        <input type="text" id="set-404-title">
+        <div class="lbl">主文</div>
+        <input type="text" id="set-404-t">
+        <div class="lbl">副文</div>
+        <input type="text" id="set-404-s">
+        <div class="lbl">返回按钮</div>
+        <input type="text" id="set-404-go">
+        <div class="lbl">底部提示</div>
+        <input type="text" id="set-404-hint">
+        <div class="btn-row"><button class="btn primary" id="btnSave404" type="button">保存404文字</button></div>
+    </div>
+</div>
+
+<!-- 插件 -->
+<div class="panel" id="p-plg">
+    <div class="sec">
+        <h3>特效插件（开启后前台加载）</h3>
+        <div id="plgList"></div>
+    </div>
+</div>
+
+<nav class="nav">
+    <button class="on" data-t="p-img">图片</button>
+    <button data-t="p-audio">音频</button>
+    <button data-t="p-bg">背景</button>
+    <button data-t="p-set">设置</button>
+    <button data-t="p-plg">插件</button>
+</nav>
+
+<div class="mask" id="mask"></div>
+<div class="menu" id="menu"></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+/* ================= 基础 ================= */
+var REPO = 'bxhrdhr/gallery';
+var tk = '';
+var idxHtml = '';
+var idxSha = '';
+var cfg = null;
+var f404 = '';
+var sha404 = '';
+var curImg = -1;
+var selMode = false;
+var selSet = {};
+
+function msg(t) {
+    var el = document.getElementById('toast');
+    el.textContent = t; el.style.display = 'block';
+    clearTimeout(msg._t);
+    msg._t = setTimeout(function () { el.style.display = 'none'; }, 2200);
+}
+function bD(s) { try { return decodeURIComponent(escape(atob(s))); } catch(e) { return atob(s); } }
+function bE(s) { return btoa(unescape(encodeURIComponent(s))); }
+
+function api(p, m, b) {
+    var o = { method: m || 'GET', headers: { 'Authorization': 'token ' + tk, 'Accept': 'application/vnd.github.v3+json' } };
+    if (b) o.body = JSON.stringify(b);
+    return fetch('https://api.github.com/repos/' + REPO + p, o).then(function (r) {
+        if (!r.ok) throw r;
+        return r.status !== 204 ? r.json() : null;
+    });
+}
+
+/* ================= 配置解析 ================= */
+function parseCfg(html) {
+    var m = html.match(/var CFG = ([\s\S]*?);\s*var ASSET_BASE/);
+    if (!m) throw new Error('配置解析失败');
+    return JSON.parse(m[1]);
+}
+function buildCfg() {
+    var s = JSON.stringify(cfg, null, 2);
+    return idxHtml.replace(/var CFG = [\s\S]*?;\s*var ASSET_BASE/, 'var CFG = ' + s + ';\nvar ASSET_BASE');
+}
+function saveIdx(cb) {
+    var html = buildCfg();
+    api('/contents/index.html', 'PUT', { message: 'Sync 图库', content: bE(html), sha: idxSha }).then(function (r) {
+        idxSha = r.content.sha; idxHtml = html;
+        msg('已保存');
+        if (cb) cb();
+    }).catch(function () { msg('保存失败，请重试'); });
+}
+
+/* ================= 登录 ================= */
+function doLogin() {
+    tk = document.getElementById('tk').value.trim();
+    if (!tk) return msg('请输入令牌');
+    fetch('https://api.github.com/user', { headers: { 'Authorization': 'token ' + tk, 'Accept': 'application/vnd.github.v3+json' } })
+        .then(function (r) { if (!r.ok) throw r; return r.json(); })
+        .then(function (u) {
+            var rem = document.getElementById('rem').checked;
+            (rem ? localStorage : sessionStorage).setItem('gt', tk);
+            document.getElementById('loginSheet').classList.remove('show');
+            document.getElementById('hdRepo').textContent = u.login + ' / ' + REPO.split('/')[1];
+            loadAll();
+        })
+        .catch(function () { msg('令牌无效，请检查'); });
+}
+document.getElementById('btnLogin').onclick = doLogin;
+(function () {
+    var saved = localStorage.getItem('gt') || sessionStorage.getItem('gt');
+    if (saved) { tk = saved; document.getElementById('loginSheet').classList.remove('show'); document.getElementById('hdRepo').textContent = '登录中...'; loadAll(); }
+})();
+
+/* ================= 数据加载 ================= */
+function loadAll() {
+    document.getElementById('hdRefresh').textContent = '…';
+    var p1 = api('/contents/index.html').then(function (r) {
+        idxHtml = bD(r.content); idxSha = r.sha;
+        cfg = parseCfg(idxHtml);
+    });
+    var p2 = api('/contents/404.html').then(function (r) {
+        f404 = bD(r.content); sha404 = r.sha;
+    }).catch(function () {});
+    Promise.all([p1, p2]).then(function () {
+        document.getElementById('hdRefresh').textContent = '↻';
+        fillBase(); fillHero(); fill404(); renderGrid(); renderAudio(); renderBgs(); renderPlg(); fillCatSel();
+    }).catch(function () { msg('加载失败，请检查令牌权限'); });
+}
+document.getElementById('hdRefresh').onclick = loadAll;
+
+/* ================= 图片 ================= */
+function catName(id) {
+    for (var i = 0; i < cfg.cats.length; i++) if (cfg.cats[i].id === id) return cfg.cats[i].name;
+    return '未分类';
+}
+function fillCatSel() {
+    var s = document.getElementById('upCat');
+    s.innerHTML = '';
+    cfg.cats.forEach(function (c) { if (c.id !== 'all') { var o = document.createElement('option'); o.value = c.id; o.textContent = c.name; s.appendChild(o); } });
+}
+function renderGrid() {
+    var g = document.getElementById('imgGrid');
+    g.innerHTML = '';
+    document.getElementById('imgEmpty').style.display = cfg.imgs.length ? 'none' : 'block';
+    document.getElementById('imgEmpty').textContent = cfg.imgs.length ? '' : '还没有图片，点「上传图片」添加';
+    cfg.imgs.forEach(function (it, i) {
+        var d = document.createElement('div');
+        d.className = 'tile' + (selSet[i] ? ' sel' : '');
+        d.innerHTML = '<img src="https://raw.githubusercontent.com/' + REPO + '/main/' + it.f + '" loading="lazy">' +
+            '<div class="nm">' + it.t + '</div><div class="tag">' + catName(it.c) + '</div>' +
+            '<div class="sel"></div>';
+        d.onclick = function () {
+            if (selMode) { selSet[i] = !selSet[i]; renderGrid(); }
+            else openMenu(i);
+        };
+        g.appendChild(d);
+    });
+    document.getElementById('multiBar').style.display = selMode ? 'flex' : 'none';
+}
+function openMenu(i) {
+    curImg = i;
+    var it = cfg.imgs[i];
+    var h = '';
+    h += '<div class="mi" onclick="sheetRename(' + i + ')">改名字（展示名）</div>';
+    h += '<div class="mi" onclick="sheetMoveCat(' + i + ')">移动到分类</div>';
+    h += '<div class="mi" onclick="sheetMove(' + i + ',-1)">上移一位</div>';
+    h += '<div class="mi" onclick="sheetMove(' + i + ',1)">下移一位</div>';
+    h += '<div class="mi" onclick="sheetPin(' + i + ')">置顶</div>';
+    h += '<div class="mi danger" onclick="sheetDel(' + i + ')">删除</div>';
+    document.getElementById('menu').innerHTML = h;
+    showMenu(true);
+}
+function showMenu(v) {
+    document.getElementById('menu').classList.toggle('show', v);
+    document.getElementById('mask').classList.toggle('show', v);
+}
+document.getElementById('mask').onclick = function () { showMenu(false); closeSheet(); };
+
+function sheetRename(i) {
+    showMenu(false);
+    var it = cfg.imgs[i];
+    showSheet('<h3>修改图片名字</h3>' +
+        '<div class="lbl">显示名字</div><input type="text" id="rn-t" value="' + esc(it.t) + '">' +
+        '<div class="lbl">文件路径（一般不用改）</div><input type="text" id="rn-f" value="' + esc(it.f) + '">' +
+        '<div class="btn-row"><button class="btn primary" onclick="doRename(' + i + ')">保存</button><button class="btn" onclick="closeSheet()">取消</button></div>');
+}
+function doRename(i) {
+    var t = document.getElementById('rn-t').value.trim();
+    var f = document.getElementById('rn-f').value.trim();
+    if (!t) return msg('名字不能为空');
+    cfg.imgs[i].t = t;
+    if (f && f !== cfg.imgs[i].f) cfg.imgs[i].f = f;
+    saveIdx(function () { renderGrid(); closeSheet(); });
+}
+function sheetMoveCat(i) {
+    showMenu(false);
+    var opts = cfg.cats.filter(function (c) { return c.id !== 'all'; }).map(function (c) {
+        return '<option value="' + c.id + '"' + (cfg.imgs[i].c === c.id ? ' selected' : '') + '>' + c.name + '</option>';
+    }).join('');
+    showSheet('<h3>移动到分类</h3><select id="mv-cat">' + opts + '</select>' +
+        '<div class="btn-row"><button class="btn primary" onclick="doMoveCat(' + i + ')">保存</button><button class="btn" onclick="closeSheet()">取消</button></div>');
+}
+function doMoveCat(i) {
+    cfg.imgs[i].c = document.getElementById('mv-cat').value;
+    saveIdx(function () { renderGrid(); closeSheet(); });
+}
+function sheetMove(i, d) {
+    showMenu(false);
+    var j = i + d;
+    if (j < 0 || j >= cfg.imgs.length) return msg('已在边缘');
+    var tmp = cfg.imgs[i]; cfg.imgs[i] = cfg.imgs[j]; cfg.imgs[j] = tmp;
+    saveIdx(function () { renderGrid(); });
+}
+function sheetPin(i) {
+    showMenu(false);
+    var it = cfg.imgs.splice(i, 1)[0];
+    cfg.imgs.unshift(it);
+    saveIdx(function () { renderGrid(); });
+}
+function sheetDel(i) {
+    showMenu(false);
+    var it = cfg.imgs[i];
+    if (!confirm('删除图片「' + it.t + '」？文件将彻底删除，不可恢复')) return;
+    api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
+        cfg.imgs.splice(i, 1);
+        saveIdx(function () { renderGrid(); });
+    }).catch(function () { msg('删除失败，可稍后重试'); });
+}
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+/* 上传 */
+document.getElementById('btnUp').onclick = function () { document.getElementById('upFiles').click(); };
+document.getElementById('upFiles').onchange = function () {
+    var files = Array.prototype.slice.call(this.files);
+    if (!files.length) return;
+    var cat = document.getElementById('upCat').value;
+    var i = 0;
+    msg('上传中 0/' + files.length);
+    (function next() {
+        if (i >= files.length) {
+            document.getElementById('upFiles').value = '';
+            msg('全部上传完成');
+            loadAll(); return;
+        }
+        var f = files[i];
+        var ext = (f.name.match(/\.(\w+)$/) || [, 'jpg'])[1].toLowerCase();
+        var fn = 'img/' + Date.now() + '_' + Math.floor(Math.random() * 999) + '.' + ext;
+        var rd = new FileReader();
+        rd.onload = function () {
+            api('/contents/' + fn, 'PUT', { message: 'Up ' + fn, content: rd.result.split(',')[1] }).then(function () {
+                cfg.imgs.push({ f: fn, t: f.name.replace(/\.[^.]+$/, ''), c: cat });
+                i++;
+                msg('上传中 ' + i + '/' + files.length);
+                if (i === files.length) {
+                    saveIdx(function () { msg('上传完成'); renderGrid(); });
+                } else next();
+            }).catch(function () { msg('上传失败'); });
+        };
+        rd.readAsDataURL(f);
+    })();
+};
+
+/* 多选 */
+document.getElementById('btnMulti').onclick = function () {
+    selMode = !selMode; selSet = {};
+    renderGrid();
+};
+document.getElementById('btnMCancel').onclick = function () { selMode = false; selSet = {}; renderGrid(); };
+document.getElementById('btnMDel').onclick = function () {
+    var keys = Object.keys(selSet).filter(function (k) { return selSet[k]; }).map(Number).sort(function (a, b) { return b - a; });
+    if (!keys.length) return msg('请先选择图片');
+    if (!confirm('删除所选 ' + keys.length + ' 张图片？')) return;
+    var i = 0;
+    msg('删除中...');
+    (function next() {
+        if (i >= keys.length) { saveIdx(function () { msg('删除完成'); selMode = false; selSet = {}; renderGrid(); }); return; }
+        var k = keys[i];
+        var it = cfg.imgs[k];
+        api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
+            cfg.imgs.splice(k, 1); i++; next();
+        }).catch(function () { cfg.imgs.splice(k, 1); i++; next(); });
+    })();
+};
+document.getElementById('btnMMove').onclick = function () {
+    var keys = Object.keys(selSet).filter(function (k) { return selSet[k]; }).map(Number);
+    if (!keys.length) return msg('请先选择图片');
+    var opts = cfg.cats.filter(function (c) { return c.id !== 'all'; }).map(function (c) { return '<option value="' + c.id + '">' + c.name + '</option>'; }).join('');
+    showSheet('<h3>移动到分类</h3><select id="mm-cat">' + opts + '</select>' +
+        '<div class="btn-row"><button class="btn primary" onclick="doMMove(' + JSON.stringify(keys) + ')">保存</button><button class="btn" onclick="closeSheet()">取消</button></div>');
+};
+function doMMove(keys) {
+    var c = document.getElementById('mm-cat').value;
+    keys.forEach(function (k) { cfg.imgs[k].c = c; });
+    saveIdx(function () { renderGrid(); closeSheet(); selMode = false; selSet = {}; });
+}
+
+/* ================= 分类管理 ================= */
+document.getElementById('btnCats').onclick = function () {
+    var rows = cfg.cats.filter(function (c) { return c.id !== 'all'; }).map(function (c, i) {
+        return '<div class="opt"><span class="nm2">' + c.name + '</span>' +
+            '<button class="btn sm" onclick="catRename(\'' + c.id + '\')">改名</button>' +
+            '<button class="btn sm danger" onclick="catDel(\'' + c.id + '\')">删除</button></div>';
+    }).join('');
+    showSheet('<h3>分类管理</h3>' + (rows || '<div style="color:var(--dim);font-size:12px;">还没有分类</div>') +
+        '<div class="lbl">新分类名</div><input type="text" id="newCat">' +
+        '<div class="btn-row"><button class="btn primary" onclick="catAdd()">添加分类</button><button class="btn" onclick="closeSheet()">关闭</button></div>');
+};
+function catAdd() {
+    var n = document.getElementById('newCat').value.trim();
+    if (!n) return msg('请输入分类名');
+    var id = 'c' + Date.now().toString(36);
+    cfg.cats.push({ id: id, name: n });
+    saveIdx(function () { closeSheet(); fillCatSel(); document.getElementById('btnCats').click(); });
+}
+function catRename(id) {
+    var c = null;
+    cfg.cats.forEach(function (x) { if (x.id === id) c = x; });
+    showSheet('<h3>重命名分类</h3><input type="text" id="rnc" value="' + esc(c.name) + '">' +
+        '<div class="btn-row"><button class="btn primary" onclick="doCatRename(\'' + id + '\')">保存</button><button class="btn" onclick="document.getElementById(\'btnCats\').click()">取消</button></div>');
+}
+function doCatRename(id) {
+    var n = document.getElementById('rnc').value.trim();
+    if (!n) return msg('名字不能为空');
+    cfg.cats.forEach(function (x) { if (x.id === id) x.name = n; });
+    saveIdx(function () { closeSheet(); fillCatSel(); document.getElementById('btnCats').click(); });
+}
+function catDel(id) {
+    if (!confirm('删除分类？该分类下图片将回到「全部」')) return;
+    cfg.cats = cfg.cats.filter(function (c) { return c.id !== id; });
+    cfg.imgs.forEach(function (it) { if (it.c === id) it.c = 'all'; });
+    saveIdx(function () { closeSheet(); fillCatSel(); renderGrid(); });
+}
+
+/* ================= 音频 ================= */
+document.getElementById('btnUpA').onclick = function () { document.getElementById('upFilesA').click(); };
+document.getElementById('upFilesA').onchange = function () {
+    var files = Array.prototype.slice.call(this.files);
+    if (!files.length) return;
+    var i = 0;
+    msg('上传中 0/' + files.length);
+    (function next() {
+        if (i >= files.length) { document.getElementById('upFilesA').value = ''; msg('全部上传完成'); return; }
+        var f = files[i];
+        var ext = (f.name.match(/\.(\w+)$/) || [, 'mp3'])[1].toLowerCase();
+        var fn = 'mp3/' + Date.now() + '_' + Math.floor(Math.random() * 999) + '.' + ext;
+        var rd = new FileReader();
+        rd.onload = function () {
+            api('/contents/' + fn, 'PUT', { message: 'Up ' + fn, content: rd.result.split(',')[1] }).then(function () {
+                cfg.musics.push({ f: fn, name: f.name.replace(/\.[^.]+$/, '') });
+                i++; msg('上传中 ' + i + '/' + files.length);
+                if (i === files.length) saveIdx(function () { msg('上传完成'); renderAudio(); });
+                else next();
+            }).catch(function () { msg('上传失败'); });
+        };
+        rd.readAsDataURL(f);
+    })();
+};
+function renderAudio() {
+    var box = document.getElementById('audioList');
+    box.innerHTML = '';
+    document.getElementById('audioEmpty').style.display = cfg.musics.length ? 'none' : 'block';
+    document.getElementById('audioEmpty').textContent = cfg.musics.length ? '' : '还没有音乐，点「上传音乐」添加';
+    cfg.musics.forEach(function (m, i) {
+        var d = document.createElement('div');
+        d.className = 'opt';
+        d.innerHTML = '<span class="nm2">' + m.name + '</span>' +
+            '<button class="btn sm" onclick="audioUp(' + i + ')">上移</button>' +
+            '<button class="btn sm" onclick="audioDown(' + i + ')">下移</button>' +
+            '<button class="btn sm danger" onclick="audioDel(' + i + ')">删除</button>';
+        box.appendChild(d);
+    });
+}
+function audioUp(i) { if (i <= 0) return; var t = cfg.musics[i]; cfg.musics[i] = cfg.musics[i - 1]; cfg.musics[i - 1] = t; saveIdx(function () { renderAudio(); }); }
+function audioDown(i) { if (i >= cfg.musics.length - 1) return; var t = cfg.musics[i]; cfg.musics[i] = cfg.musics[i + 1]; cfg.musics[i + 1] = t; saveIdx(function () { renderAudio(); }); }
+function audioDel(i) {
+    var m = cfg.musics[i];
+    if (!confirm('删除音乐「' + m.name + '」？')) return;
+    api('/contents/' + m.f, 'DELETE', { message: 'Del ' + m.f, sha: m._sha }).then(function () {
+        cfg.musics.splice(i, 1);
+        saveIdx(function () { renderAudio(); });
+    }).catch(function () { msg('删除失败'); });
+}
+
+/* ================= 背景 ================= */
+var BGS = [
+    { id: 'cream',  name: '奶油暖光', css: 'linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)' },
+    { id: 'forest', name: '墨绿森林', css: 'linear-gradient(165deg,#24402e,#14271b 60%,#0c1a11)' },
+    { id: 'night',  name: '暗夜蓝紫', css: 'linear-gradient(165deg,#232a4d,#141731 60%,#0b0d1d)' },
+    { id: 'sakura', name: '樱花粉白', css: 'linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)' },
+    { id: 'aurora', name: '极光青蓝', css: 'linear-gradient(165deg,#0d3f46,#0a2a33 55%,#071c24)' }
+];
+function renderBgs() {
+    var box = document.getElementById('bgList');
+    box.innerHTML = '';
+    BGS.forEach(function (b) {
+        var d = document.createElement('div');
+        d.className = 'bg-card' + (cfg.bg === b.id ? ' on' : '');
+        d.innerHTML = '<div class="bg-prev" style="background:' + b.css + ';"></div><div style="font-size:13px;letter-spacing:.12em;">' + b.name + '</div>';
+        d.onclick = function () { cfg.bg = b.id; saveIdx(function () { renderBgs(); }); };
+        box.appendChild(d);
+    });
+}
+
+/* ================= 设置 ================= */
+function fillBase() {
+    document.getElementById('set-name').value = cfg.name || '';
+    document.getElementById('set-intro').value = cfg.intro || '';
+    document.getElementById('set-uiTitle').value = cfg.uiTitle || '';
+    document.getElementById('set-uiSub').value = cfg.uiSub || '';
+}
+function fillHero() {
+    document.getElementById('set-eyebrow').value = cfg.hero.eyebrow || '';
+    document.getElementById('set-title').value = cfg.hero.title || '';
+    document.getElementById('set-sub').value = cfg.hero.sub || '';
+    document.getElementById('set-cta').value = cfg.cta || '';
+}
+document.getElementById('btnSaveBase').onclick = function () {
+    cfg.name = document.getElementById('set-name').value.trim();
+    cfg.intro = document.getElementById('set-intro').value.trim();
+    cfg.uiTitle = document.getElementById('set-uiTitle').value.trim();
+    cfg.uiSub = document.getElementById('set-uiSub').value.trim();
+    saveIdx();
+};
+document.getElementById('btnSaveHero').onclick = function () {
+    cfg.hero.eyebrow = document.getElementById('set-eyebrow').value.trim();
+    cfg.hero.title = document.getElementById('set-title').value.trim();
+    cfg.hero.sub = document.getElementById('set-sub').value.trim();
+    cfg.cta = document.getElementById('set-cta').value.trim();
+    saveIdx();
+};
+
+/* 404 */
+function fill404() {
+    if (!f404) return;
+    var m;
+    m = f404.match(/<title>([\s\S]*?)<\/title>/); if (m) document.getElementById('set-404-title').value = m[1];
+    m = f404.match(/<h1 class="t">([\s\S]*?)<\/h1>/); if (m) document.getElementById('set-404-t').value = m[1];
+    m = f404.match(/<p class="s">([\s\S]*?)<\/p>/); if (m) document.getElementById('set-404-s').value = m[1];
+    m = f404.match(/<button id="go"[^>]*>([\s\S]*?)<\/button>/); if (m) document.getElementById('set-404-go').value = m[1];
+    m = f404.match(/<p class="hint">([\s\S]*?)<\/p>/); if (m) document.getElementById('set-404-hint').value = m[1];
+}
+document.getElementById('btnSave404').onclick = function () {
+    if (!f404) return msg('404 文件未加载');
+    var n = f404;
+    function rep(re, val) { if (val) n = n.replace(re, function (m, a, b) { return a + val + b; }); }
+    rep(/(<title>)[\s\S]*?(<\/title>)/, document.getElementById('set-404-title').value.trim());
+    rep(/(<h1 class="t">)[\s\S]*?(<\/h1>)/, document.getElementById('set-404-t').value.trim());
+    rep(/(<p class="s">)[\s\S]*?(<\/p>)/, document.getElementById('set-404-s').value.trim());
+    rep(/(<button id="go"[^>]*>)[\s\S]*?(<\/button>)/, document.getElementById('set-404-go').value.trim());
+    rep(/(<p class="hint">)[\s\S]*?(<\/p>)/, document.getElementById('set-404-hint').value.trim());
+    api('/contents/404.html', 'PUT', { message: 'Update 404', content: bE(n), sha: sha404 }).then(function (r) {
+        sha404 = r.content.sha; f404 = n;
+        msg('404 文字已保存');
+    }).catch(function () { msg('保存失败'); });
+};
+
+/* ================= 插件 ================= */
+function renderPlg() {
+    var box = document.getElementById('plgList');
+    box.innerHTML = '<div style="color:var(--dim);font-size:12px;">读取中...</div>';
+    var dirs = ['', '全屏', '图片', '文字', '点击'];
+    var jobs = dirs.map(function (sub) {
+        var p = sub ? '/js/' + encodeURIComponent(sub) : '/js';
+        return api(p).then(function (list) {
+            return (list || []).filter(function (it) { return it.type === 'file' && /\.js$/.test(it.name); })
+                .map(function (it) {
+                    return { path: sub ? 'js/' + sub + '/' + it.name : 'js/' + it.name, name: sub ? sub + ' / ' + it.name : it.name };
+                });
+        }).catch(function () { return []; });
+    });
+    Promise.all(jobs).then(function (parts) {
+        var files = [].concat.apply([], parts);
+        box.innerHTML = '';
+        if (!files.length) { box.innerHTML = '<div style="color:var(--dim);font-size:12px;">js 目录暂无特效文件</div>'; return; }
+        files.forEach(function (f) {
+            var on = cfg.fx.indexOf(f.path) !== -1;
+            var d = document.createElement('div');
+            d.className = 'opt';
+            d.innerHTML = '<span class="nm2">' + f.name + '</span>' +
+                '<div class="switch' + (on ? ' on' : '') + '" onclick="toggleFx(\'' + f.path.replace(/'/g, "\\'") + '\')"><i></i></div>';
+            box.appendChild(d);
+        });
+    });
+}
+function toggleFx(p) {
+    var ix = cfg.fx.indexOf(p);
+    if (ix === -1) cfg.fx.push(p);
+    else cfg.fx.splice(ix, 1);
+    saveIdx(function () { renderPlg(); });
+}
+
+/* ================= 通用弹层 ================= */
+function showSheet(html) {
+    document.getElementById('sheet').innerHTML = '<div class="box">' + html + '</div>';
+    document.getElementById('sheet').classList.add('show');
+}
+function closeSheet() { document.getElementById('sheet').classList.remove('show'); }
+document.getElementById('sheet').addEventListener('click', function (e) { if (e.target.id === 'sheet') closeSheet(); });
+
+/* ================= 导航 ================= */
+var navBtns = document.querySelectorAll('.nav button');
+navBtns.forEach(function (b) {
+    b.onclick = function () {
+        navBtns.forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('on'); });
+        document.getElementById(b.dataset.t).classList.add('on');
+    };
+});
+
+/* 渲染图片时补充 sha 信息（删除用） */
+function enrichShas() {
+    var jobs = cfg.imgs.map(function (it) {
+        return api('/contents/' + it.f).then(function (d) { it._sha = d.sha; }).catch(function () {});
+    });
+    return Promise.all(jobs);
+}
+var _renderGrid0 = renderGrid;
+renderGrid = function () {
+    enrichShas().then(function () { _renderGrid0(); });
+};
+var _renderAudio0 = renderAudio;
+renderAudio = function () {
+    cfg.musics.forEach(function (m) {
+        api('/contents/' + m.f).then(function (d) { m._sha = d.sha; }).catch(function () {});
+    });
+    _renderAudio0();
+};
+</script>
+</body>
+</html>
