@@ -154,13 +154,30 @@ a, button { -webkit-tap-highlight-color: transparent; }
     transition: all .3s ease;
 }
 .ppanel.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.ppanel .phead {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #ffb3d1; letter-spacing: .18em; margin-bottom: 10px;
+    cursor: move; user-select: none; -webkit-user-select: none;
+    padding: 2px 0;
+}
+.ppanel .phead svg { width: 12px; height: 12px; flex: none; }
+.ppanel .phead .phint { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .1em; }
 .ppanel .pt { font-size: 12px; color: #ffb3d1; letter-spacing: .18em; margin-bottom: 10px; }
 .ppanel .pnm { font-size: 13px; color: #fff; letter-spacing: .08em; margin-bottom: 12px; min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ppanel .pbar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; margin-bottom: 14px; }
 .ppanel .pbar i { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg,#ff9ec5,#f272a6); transition: width .3s linear; }
-.ppanel .pbtns { display: flex; align-items: center; justify-content: center; gap: 26px; }
-.ppanel .pbtns button { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 6px; }
-.ppanel .pbtns .pbig { font-size: 30px; }
+.ppanel .pbtns { display: flex; align-items: center; justify-content: center; gap: 30px; }
+.ppanel .pbtns button {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 50%;
+    color: #fff; width: 40px; height: 40px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s ease;
+}
+.ppanel .pbtns button:hover { background: rgba(255,255,255,.16); transform: scale(1.06); }
+.ppanel .pbtns button:active { transform: scale(.94); }
+.ppanel .pbtns button svg { width: 18px; height: 18px; }
+.ppanel .pbtns .pbig { width: 54px; height: 54px; background: linear-gradient(135deg,#ff9ec5,#f272a6); border-color: transparent; box-shadow: 0 6px 18px rgba(242,114,166,.4); }
+.ppanel .pbtns .pbig svg { width: 26px; height: 26px; }
 .pempty { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; padding: 6px 0 2px; }
 
 /* ============ 灯箱 ============ */
@@ -212,13 +229,17 @@ a, button { -webkit-tap-highlight-color: transparent; }
 <!-- 播放器 -->
 <button class="pfab" id="pfab" type="button" aria-label="音乐">♪<i class="pulse"></i></button>
 <div class="ppanel" id="ppanel">
-    <div class="pt">MUSIC 小站</div>
+    <div class="phead" id="pHead" title="按住标题可拖动">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+        <span>MUSIC 小站</span>
+        <span class="phint">按住拖动</span>
+    </div>
     <div class="pnm" id="pnm">暂无音乐</div>
     <div class="pbar"><i id="pbar"></i></div>
     <div class="pbtns">
-        <button id="pPrev" type="button">⏮</button>
-        <button class="pbig" id="pPlay" type="button">▶</button>
-        <button id="pNext" type="button">⏭</button>
+        <button id="pPrev" type="button" aria-label="上一曲"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg></button>
+        <button class="pbig" id="pPlay" type="button" aria-label="播放/暂停"><svg id="pPlayIco" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        <button id="pNext" type="button" aria-label="下一曲"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
     </div>
 </div>
 
@@ -241,112 +262,33 @@ var CFG = {
   "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "forest",
+  "bg": "cream",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
-    {
-      "id": "cream",
-      "name": "奶油暖光",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"
-    },
-    {
-      "id": "forest",
-      "name": "墨绿森林",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
-    },
-    {
-      "id": "night",
-      "name": "暗夜蓝紫",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
-    },
-    {
-      "id": "sakura",
-      "name": "樱花粉白",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "aurora",
-      "name": "极光青蓝",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
-    }
+    { "id": "cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)" },
+    { "id": "forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)" },
+    { "id": "night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)" },
+    { "id": "sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)" },
+    { "id": "aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)" }
   ],
-  "hero": {
-    "eyebrow": "拾光 · 收藏每一帧",
-    "title": "把日子过成画",
-    "sub": "分类收藏 · 慢慢翻阅",
-    "cta": "进入图库"
-  },
+  "hero": { "eyebrow": "拾光 · 收藏每一帧", "title": "把日子过成画", "sub": "分类收藏 · 慢慢翻阅", "cta": "进入图库" },
   "cats": [
-    {
-      "id": "all",
-      "name": "全部"
-    },
-    {
-      "id": "life",
-      "name": "生活"
-    },
-    {
-      "id": "view",
-      "name": "风景"
-    },
-    {
-      "id": "food",
-      "name": "美食"
-    }
+    { "id": "all", "name": "全部" },
+    { "id": "life", "name": "生活" },
+    { "id": "view", "name": "风景" },
+    { "id": "food", "name": "美食" }
   ],
   "imgs": [
-    {
-      "f": "img/demo1.jpg",
-      "t": "山谷晨光",
-      "c": "view",
-      "_sha": "8cc8990b18e1fc4c7fbedbf6c88bb6f2e1dea549"
-    },
-    {
-      "f": "img/demo2.jpg",
-      "t": "一杯咖啡",
-      "c": "food",
-      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
-    },
-    {
-      "f": "img/demo3.jpg",
-      "t": "傍晚散步",
-      "c": "life",
-      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a"
-    },
-    {
-      "f": "img/1789468891861_567.jpg",
-      "t": "深圳一日游",
-      "c": "life",
-      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
-    }
+    { "f": "img/demo1.jpg", "t": "山谷晨光", "c": "view" },
+    { "f": "img/demo2.jpg", "t": "一杯咖啡", "c": "food" },
+    { "f": "img/demo3.jpg", "t": "傍晚散步", "c": "life" }
   ],
   "musics": [
-    {
-      "f": "mp3/尾季篇.mp3",
-      "name": "尾季篇",
-      "_sha": "a155ceeb04bfd05e56b1c4b9a1dc6e68ea7e74ff"
-    },
-    {
-      "f": "mp3/失去后才明白.mp3",
-      "name": "失去后才明白",
-      "_sha": "9676397dc1b0e71850e7e7f30682085ac3b67f06"
-    },
-    {
-      "f": "mp3/温柔的徘徊.mp3",
-      "name": "温柔的徘徊",
-      "_sha": "fd7c4885a3d9ddb3a1caade334a65787d2e6fffb"
-    },
-    {
-      "f": "mp3/落日.mp3",
-      "name": "落日",
-      "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
-    }
+    { "f": "mp3/尾季篇.mp3", "name": "尾季篇" },
+    { "f": "mp3/失去后才明白.mp3", "name": "失去后才明白" },
+    { "f": "mp3/温柔的徘徊.mp3", "name": "温柔的徘徊" },
+    { "f": "mp3/落日.mp3", "name": "落日" }
   ],
   "fx": []
 };
@@ -530,6 +472,10 @@ var audio = null, mIdx = 0, mList = C.musics || [];
 var pfab = document.getElementById('pfab'), ppanel = document.getElementById('ppanel');
 pfab.onclick = function () { ppanel.classList.toggle('show'); };
 function mName() { return mList.length ? (mList[mIdx].name || mList[mIdx].f) : '暂无音乐'; }
+function setPIco(playing) {
+    var ico = document.getElementById('pPlayIco');
+    ico.innerHTML = playing ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+}
 function loadM() {
     if (!mList.length) return;
     if (audio) { audio.pause(); audio = null; }
@@ -539,30 +485,75 @@ function loadM() {
     });
     audio.addEventListener('ended', function () { nextM(true); });
     document.getElementById('pnm').textContent = mName();
-    document.getElementById('pPlay').textContent = '▶';
+    setPIco(false);
 }
 function toggleM() {
     if (!mList.length) return;
     if (!audio) loadM();
-    if (audio.paused) { audio.play(); document.getElementById('pPlay').textContent = '⏸'; }
-    else { audio.pause(); document.getElementById('pPlay').textContent = '▶'; }
+    if (audio.paused) { audio.play(); setPIco(true); }
+    else { audio.pause(); setPIco(false); }
 }
 function nextM(auto) {
     if (!mList.length) return;
     mIdx = (mIdx + 1) % mList.length;
     loadM();
-    if (audio) { audio.play(); document.getElementById('pPlay').textContent = '⏸'; }
+    if (audio) { audio.play(); setPIco(true); }
 }
 function prevM() {
     if (!mList.length) return;
     mIdx = (mIdx - 1 + mList.length) % mList.length;
     loadM();
-    if (audio) { audio.play(); document.getElementById('pPlay').textContent = '⏸'; }
+    if (audio) { audio.play(); setPIco(true); }
 }
 document.getElementById('pPlay').onclick = toggleM;
 document.getElementById('pNext').onclick = function () { nextM(false); };
 document.getElementById('pPrev').onclick = prevM;
 document.getElementById('pnm').textContent = mName();
+
+/* ---- 播放器可拖动（按住标题栏拖动，记忆位置） ---- */
+(function () {
+    var panel = ppanel, hd = document.getElementById('pHead');
+    var sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem('ppos') || 'null'); } catch (e) {}
+    if (saved && saved.left != null) {
+        panel.style.left = saved.left + 'px';
+        panel.style.top = saved.top + 'px';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+    }
+    function start(e) {
+        var t = e.touches ? e.touches[0] : e;
+        sx = t.clientX; sy = t.clientY;
+        var r = panel.getBoundingClientRect();
+        ox = r.left; oy = r.top;
+        dragging = true;
+        panel.classList.add('show');
+        if (e.preventDefault) e.preventDefault();
+    }
+    function mv(e) {
+        if (!dragging) return;
+        var t = e.touches ? e.touches[0] : e;
+        var nx = ox + (t.clientX - sx), ny = oy + (t.clientY - sy);
+        nx = Math.max(8, Math.min(window.innerWidth - panel.offsetWidth - 8, nx));
+        ny = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, ny));
+        panel.style.left = nx + 'px';
+        panel.style.top = ny + 'px';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+    }
+    function end() {
+        if (!dragging) return;
+        dragging = false;
+        try { localStorage.setItem('ppos', JSON.stringify({ left: panel.offsetLeft, top: panel.offsetTop })); } catch (e) {}
+    }
+    hd.addEventListener('mousedown', start);
+    hd.addEventListener('touchstart', start, { passive: false });
+    window.addEventListener('mousemove', mv);
+    window.addEventListener('touchmove', mv, { passive: false });
+    window.addEventListener('mouseup', end);
+    window.addEventListener('touchend', end);
+})();
 
 /* ---------- 特效注入 ---------- */
 function fxMount(paths) {
