@@ -6,7 +6,7 @@
 <title>图库管理后台</title>
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-:root { --bg:#0f1220; --card:#1a1f33; --card2:#222842; --ink:#e8ebf7; --dim:#8b93b8; --accent:#8b9cf0; --accent2:#c9a2e8; --danger:#ff7d8c; --safe:#6fd3a8; --line:rgba(150,165,220,.14); }
+:root { --bg:#0d1317; --card:#152229; --card2:#1d2e37; --ink:#e8f1f0; --dim:#8fa8ab; --accent:#4fc6c0; --accent2:#6fa8ff; --danger:#ff7d8c; --safe:#6fd3a8; --line:rgba(120,200,205,.16); }
 html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC','Noto Sans SC',sans-serif; min-height:100vh; }
 body { padding-bottom:84px; }
 input, textarea, select, button { font-family:inherit; }
@@ -58,12 +58,12 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 /* 登录界面（居中卡片） */
 .sheet.login { align-items:center; padding:20px; }
 .sheet.login .box { border-radius:24px; padding:32px 26px 26px; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,.55); }
-.lg-ico { width:66px; height:66px; margin:0 auto 16px; border-radius:22px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 28px rgba(139,156,240,.35); }
+.lg-ico { width:66px; height:66px; margin:0 auto 16px; border-radius:22px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 28px rgba(79,198,192,.35); }
 .lg-ico svg { width:32px; height:32px; color:#fff; }
 .sheet.login .box h3 { font-size:18px; margin-bottom:6px; letter-spacing:.14em; }
 .lg-sub { font-size:12px; color:var(--dim); margin:0 0 20px; letter-spacing:.1em; }
 .lg-field { display:flex; align-items:center; gap:9px; background:var(--card2); border:1px solid var(--line); border-radius:14px; padding:0 14px; height:48px; transition:border-color .2s; }
-.lg-field:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(139,156,240,.15); }
+.lg-field:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(79,198,192,.15); }
 .lg-field svg { width:17px; height:17px; color:var(--dim); flex:none; }
 .lg-field input { border:none; background:none; margin:0; height:46px; padding:0; font-size:14px; }
 .lg-field input:focus { border:none; box-shadow:none; }
@@ -85,7 +85,7 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 .bg-prev { height:74px; border-radius:12px; margin-bottom:8px; }
 .switch { position:relative; width:46px; height:26px; border-radius:99px; background:var(--card2); border:1px solid var(--line); cursor:pointer; flex-shrink:0; }
 .switch i { position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#888; transition:all .2s ease; }
-.switch.on { background:rgba(107,145,240,.35); border-color:var(--accent); }
+.switch.on { background:rgba(79,198,192,.35); border-color:var(--accent); }
 .switch.on i { left:22px; background:var(--accent); }
 </style>
 </head>
@@ -172,14 +172,14 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
             <span class="nm2">自动切换背景</span>
             <div class="switch" id="bgAutoSw" onclick="toggleBgAuto()"><i></i></div>
         </div>
-        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后前台每隔 8 秒自动轮换一张背景</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后前台每隔 8 秒自动轮换一张背景；背景同时应用于「时光图库」与「旧站风格」两个页面</div>
         <div class="btn-row">
             <button class="btn primary" id="btnUpBg" type="button">上传背景</button>
             <button class="btn" id="btnUpBgGif" type="button">上传动图</button>
         </div>
         <input type="file" id="upBg" accept="image/*" style="display:none;">
         <input type="file" id="upBgGif" accept="image/gif" style="display:none;">
-        <div class="lbl">选择背景（前台即时生效，自定义背景可删除）</div>
+        <div class="lbl">选择背景（前台即时生效，自定义背景可删除；图片/动图背景会替换旧站风格的雨珠特效背景）</div>
         <div id="bgList"></div>
     </div>
 </div>
@@ -342,16 +342,26 @@ document.getElementById('btnLogin').onclick = doLogin;
 })();
 
 /* ================= 数据加载 ================= */
+/* 读取 index 与模板两处配置，取更新时间较新的那份，保证后台与前端显示一致 */
 function loadAll() {
     document.getElementById('hdRefresh').textContent = '…';
     var p1 = api('/contents/index.html').then(function (r) {
         idxHtml = bD(r.content); idxSha = r.sha;
-        cfg = parseCfg(idxHtml);
+        return { html: idxHtml, sha: r.sha, up: (r.updated_at || '') };
     });
-    var p2 = api('/contents/404.html').then(function (r) {
+    var p2 = api('/contents/template/ksx.html').then(function (r) {
+        return { html: bD(r.content), sha: r.sha, up: (r.updated_at || '') };
+    }).catch(function () { return null; });
+    var p3 = api('/contents/404.html').then(function (r) {
         f404 = bD(r.content); sha404 = r.sha;
     }).catch(function () {});
-    Promise.all([p1, p2]).then(function () {
+    Promise.all([p1, p2, p3]).then(function (rs) {
+        var idx = rs[0], tpl = rs[1];
+        /* 保存基底始终用 index.html（含首页特有逻辑）；配置取两份中较新的那份 */
+        idxHtml = idx.html; idxSha = idx.sha;
+        var newer = idx;
+        if (tpl && tpl.up > idx.up) newer = tpl;
+        cfg = parseCfg(newer.html);
         document.getElementById('hdRefresh').textContent = '↻';
         fillBase(); fillHero(); fill404(); renderGrid(); renderAudio(); renderBgs(); renderPlg(); fillCatSel();
     }).catch(function () { msg('加载失败，请检查令牌权限'); });
