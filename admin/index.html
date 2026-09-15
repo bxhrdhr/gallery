@@ -55,6 +55,23 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 .sheet.show { display:flex; }
 .sheet .box { width:100%; max-width:520px; background:var(--card); border-radius:22px 22px 0 0; padding:20px 18px calc(18px + env(safe-area-inset-bottom)); max-height:82vh; overflow-y:auto; }
 .sheet .box h3 { margin:0 0 12px; font-size:15px; color:var(--accent); letter-spacing:.1em; }
+/* 登录界面（居中卡片） */
+.sheet.login { align-items:center; padding:20px; }
+.sheet.login .box { border-radius:24px; padding:32px 26px 26px; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,.55); }
+.lg-ico { width:66px; height:66px; margin:0 auto 16px; border-radius:22px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 28px rgba(139,156,240,.35); }
+.lg-ico svg { width:32px; height:32px; color:#fff; }
+.sheet.login .box h3 { font-size:18px; margin-bottom:6px; letter-spacing:.14em; }
+.lg-sub { font-size:12px; color:var(--dim); margin:0 0 20px; letter-spacing:.1em; }
+.lg-field { display:flex; align-items:center; gap:9px; background:var(--card2); border:1px solid var(--line); border-radius:14px; padding:0 14px; height:48px; transition:border-color .2s; }
+.lg-field:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(139,156,240,.15); }
+.lg-field svg { width:17px; height:17px; color:var(--dim); flex:none; }
+.lg-field input { border:none; background:none; margin:0; height:46px; padding:0; font-size:14px; }
+.lg-field input:focus { border:none; box-shadow:none; }
+.lg-rem { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12px; color:var(--dim); margin:14px 0 16px; cursor:pointer; }
+.lg-rem input { width:auto; margin:0; accent-color:var(--accent); }
+.lg-btn { width:100%; padding:13px; font-size:15px; letter-spacing:.24em; border-radius:14px; }
+.lg-tip { font-size:11px; color:var(--dim); margin-top:18px; line-height:1.9; border-top:1px dashed var(--line); padding-top:14px; }
+.hd .hd-actions { display:flex; gap:8px; }
 .nav { position:fixed; bottom:0; left:0; right:0; height:64px; background:#0d101c; border-top:1px solid var(--line); display:flex; justify-content:space-around; align-items:center; z-index:50; }
 .nav button { background:none; border:none; color:var(--dim); font-size:10px; letter-spacing:.06em; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
 .nav button.on { color:var(--accent); }
@@ -79,23 +96,32 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
         <h1 id="hdTitle">图库管理</h1>
         <div class="sub" id="hdRepo">未连接</div>
     </div>
-    <button class="icon-btn" id="hdRefresh" type="button">↻</button>
+    <div class="hd-actions">
+        <button class="icon-btn" id="hdRefresh" type="button" title="刷新">↻</button>
+        <button class="icon-btn" id="hdLogout" type="button" title="退出登录">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </div>
 </div>
 <div id="toast"></div>
 
 <!-- 登录 -->
-<div class="sheet show" id="loginSheet">
+<div class="sheet login show" id="loginSheet">
     <div class="box" style="text-align:center;">
-        <h3>图库管理后台</h3>
-        <div style="font-size:12px; color:var(--dim); margin:6px 0 14px; letter-spacing:.1em;">输入 GitHub 令牌登录</div>
-        <input type="password" id="tk" placeholder="GitHub 令牌（ghp_...）">
-        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--dim); margin:8px 0;">
-            <input type="checkbox" id="rem" style="width:auto;"> 记住令牌（下次免输）
-        </label>
-        <div class="btn-row" style="justify-content:center;">
-            <button class="btn primary" id="btnLogin" type="button" style="width:100%;">安全登录</button>
+        <div class="lg-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.6"/></svg>
         </div>
-        <div style="font-size:11px; color:var(--dim); margin-top:14px; line-height:1.8;">令牌在 GitHub → Settings → Developer settings →<br>Personal access tokens 生成，勾选 repo 权限即可。</div>
+        <h3>图库管理后台</h3>
+        <p class="lg-sub">输入 GitHub 令牌，安全登录</p>
+        <div class="lg-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+            <input type="password" id="tk" placeholder="GitHub 令牌（ghp_...）">
+        </div>
+        <label class="lg-rem">
+            <input type="checkbox" id="rem"> 记住令牌（下次免输）
+        </label>
+        <button class="btn primary lg-btn" id="btnLogin" type="button">安全登录</button>
+        <p class="lg-tip">令牌在 GitHub → Settings → Developer settings →<br>Personal access tokens 生成，勾选 repo 权限即可。</p>
     </div>
 </div>
 
@@ -331,6 +357,17 @@ function loadAll() {
     }).catch(function () { msg('加载失败，请检查令牌权限'); });
 }
 document.getElementById('hdRefresh').onclick = loadAll;
+
+/* ================= 退出登录 ================= */
+document.getElementById('hdLogout').onclick = function () {
+    localStorage.removeItem('gt');
+    sessionStorage.removeItem('gt');
+    tk = ''; idxHtml = ''; idxSha = '';
+    document.getElementById('tk').value = '';
+    document.getElementById('hdRepo').textContent = '未连接';
+    document.getElementById('loginSheet').classList.add('show');
+    msg('已退出登录');
+};
 
 /* ================= 图片 ================= */
 function catName(id) {
