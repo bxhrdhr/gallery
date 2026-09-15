@@ -197,6 +197,11 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
     <div class="sec" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px;">
         <h3>旧站模板背景</h3>
         <div class="opt">
+            <span class="nm2">雨滴特效</span>
+            <div class="switch" id="tplRainSw" onclick="toggleTplRain()"><i></i></div>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">关闭后雨滴消失，页面只显示下方选择的背景（纯色/图片/动图）</div>
+        <div class="opt">
             <span class="nm2">自动切换背景</span>
             <div class="switch" id="tplBgAutoSw" onclick="toggleTplBgAuto()"><i></i></div>
         </div>
@@ -207,7 +212,7 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
         </div>
         <input type="file" id="upTplBg" accept="image/*" style="display:none;">
         <input type="file" id="upTplBgGif" accept="image/gif" style="display:none;">
-        <div class="lbl">选择背景（旧站风格页面即时生效，自定义背景可删除；图片/动图背景会替换雨珠特效）</div>
+        <div class="lbl">选择背景（旧站风格页面即时生效，自定义背景可删除；关闭雨滴特效后此背景全屏显示）</div>
         <div id="tplBgList"></div>
     </div>
 </div>
@@ -601,9 +606,12 @@ function restoreImg(i) {
 function libDel(i) {
     var it = cfg.imgs[i];
     if (!confirm('彻底删除「' + it.t + '」？文件将永久删除，无法恢复。')) return;
-    /* 先实时获取文件最新 sha 再删除，避免缓存 sha 失效导致删除失败 */
+    /* 先实时获取文件最新信息再删除；若文件已不存在（404，如之前删除残留的记录），直接清理记录 */
     api('/contents/' + it.f).then(function (d) {
         return api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: d.sha });
+    }).catch(function (e) {
+        if (e && e.status === 404) return null;   // 文件早已删除 → 继续清理记录
+        throw e;
     }).then(function () {
         cfg.imgs.splice(i, 1);
         saveIdx(function () { msg('已彻底删除'); renderLib(); renderGrid(); });
@@ -732,6 +740,9 @@ function audioLibDel(i) {
     if (!confirm('彻底删除音乐「' + m.name + '」？文件将永久删除，无法恢复。')) return;
     api('/contents/' + m.f).then(function (d) {
         return api('/contents/' + m.f, 'DELETE', { message: 'Del ' + m.f, sha: d.sha });
+    }).catch(function (e) {
+        if (e && e.status === 404) return null;   // 文件早已删除 → 继续清理记录
+        throw e;
     }).then(function () {
         cfg.musics.splice(i, 1);
         saveIdx(function () { msg('已彻底删除'); renderLibA(); renderAudio(); });
@@ -820,6 +831,8 @@ function ensureTplBgs() {
 }
 function renderTplBgs() {
     ensureTplBgs();
+    if (cfg.tplRain === undefined) cfg.tplRain = true;
+    document.getElementById('tplRainSw').className = 'switch' + (cfg.tplRain ? ' on' : '');
     document.getElementById('tplBgAutoSw').className = 'switch' + (cfg.tplBgAuto ? ' on' : '');
     var box = document.getElementById('tplBgList');
     box.innerHTML = '';
@@ -844,6 +857,11 @@ function delTplBg(id) {
 function toggleTplBgAuto() {
     cfg.tplBgAuto = !cfg.tplBgAuto;
     saveIdx(function () { renderTplBgs(); });
+}
+function toggleTplRain() {
+    if (cfg.tplRain === undefined) cfg.tplRain = true;
+    cfg.tplRain = !cfg.tplRain;
+    saveIdx(function () { renderTplBgs(); msg(cfg.tplRain ? '已开启雨滴特效' : '已关闭雨滴特效，页面只显示选择的背景'); });
 }
 document.getElementById('btnUpTplBg').onclick = function () { document.getElementById('upTplBg').click(); };
 document.getElementById('btnUpTplBgGif').onclick = function () { document.getElementById('upTplBgGif').click(); };
