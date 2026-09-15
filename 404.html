@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#fdf8f0">
+<title>页面走丢了 · 时光图库</title>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+html, body { margin: 0; height: 100%; }
+body {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    background: linear-gradient(165deg, #fdf8f0 0%, #f5ead9 55%, #efe0c8 100%);
+    color: #3d3a35;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; overflow: hidden;
+}
+.card {
+    position: relative; z-index: 2;
+    text-align: center; max-width: 420px; width: 100%;
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(160,130,90,.2);
+    border-radius: 28px;
+    padding: 40px 30px 34px;
+    box-shadow: 0 24px 70px rgba(140,110,70,.18);
+    animation: pop .6s cubic-bezier(.2,.9,.3,1.2) both;
+}
+@keyframes pop { from { opacity: 0; transform: translateY(26px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* 相框式 404 */
+.frame {
+    width: 118px; height: 118px; margin: 0 auto 22px;
+    border-radius: 22px; padding: 12px;
+    background: linear-gradient(150deg, #f7e7d4, #ecd9bd);
+    box-shadow: inset 0 0 0 2px rgba(200,160,110,.5), 0 10px 26px rgba(180,140,80,.28);
+    position: relative;
+}
+.frame::after {
+    content: '✦'; position: absolute; top: 4px; right: 14px;
+    font-size: 15px; color: #d4a373;
+}
+.frame .pg {
+    width: 100%; height: 100%; border-radius: 14px;
+    background: linear-gradient(150deg, #e8d9c2, #dcc9ab);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Georgia', serif;
+    font-size: 52px; font-weight: 700; color: #8a6f4d;
+    letter-spacing: .06em; text-indent: .06em;
+}
+.frame .pg i { font-style: normal; }
+h1 { margin: 0 0 10px; font-size: 20px; font-weight: 600; letter-spacing: .16em; color: #4a4238; }
+p { margin: 0 0 6px; font-size: 13px; letter-spacing: .12em; color: #8a8377; line-height: 1.9; }
+.tip { margin-top: 4px; font-size: 11px; letter-spacing: .14em; color: #b3a894; }
+.go {
+    display: inline-block; margin-top: 22px; padding: 13px 44px; border-radius: 999px;
+    font-family: inherit; font-size: 14px; letter-spacing: .3em; text-indent: .3em;
+    color: #fff; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #e07a5f, #d4a373);
+    box-shadow: 0 10px 26px rgba(224,122,95,.35);
+    transition: transform .25s ease;
+}
+.go:active { transform: scale(.95); }
+/* 背景装饰 */
+.dots { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(rgba(190,150,100,.18) 1.4px, transparent 1.4px);
+    background-size: 26px 26px; }
+.blob { position: fixed; border-radius: 50%; filter: blur(70px); z-index: 0; pointer-events: none; }
+.blob.a { width: 340px; height: 340px; top: -90px; left: -70px; background: rgba(224,122,95,.22); }
+.blob.b { width: 300px; height: 300px; bottom: -80px; right: -60px; background: rgba(212,163,115,.25); }
+</style>
+</head>
+<body>
+<div class="dots" aria-hidden="true"></div>
+<div class="blob a" aria-hidden="true"></div>
+<div class="blob b" aria-hidden="true"></div>
+
+<main class="card">
+    <div class="frame"><div class="pg"><i>4<i>0</i>4</i></div></div>
+    <h1>这条路，走不到回忆里了</h1>
+    <p>页面走丢了 · 照片还在原地</p>
+    <p class="tip">返回主页，继续翻阅你的相册吧</p>
+    <button class="go" id="go" type="button">回到主页</button>
+</main>
+
+<script>
+(function () {
+    var go = document.getElementById('go');
+    go.addEventListener('click', function () { location.replace('/'); });
+})();
+</script>
+</body>
+</html>
