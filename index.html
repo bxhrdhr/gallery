@@ -9,30 +9,54 @@
 <script>
 /* ==================== 站点配置（后台「设置」会改写这里） ==================== */
 var CFG = {
-    name: '时光图库',
-    intro: '一座小小的图库，收藏生活的风景与故事。',
-    uiTitle: 'TIME GALLERY',
-    uiSub: '时光图库',
-    bg: 'cream',
-    hero: {
-        eyebrow: '拾光 · 收藏每一帧',
-        title: '把日子过成画',
-        sub: '分类收藏 · 慢慢翻阅'
+  "name": "时光图库",
+  "intro": "一座小小的图库，收藏生活的风景与故事。",
+  "uiTitle": "TIME GALLERY",
+  "uiSub": "时光图库",
+  "bg": "cream",
+  "hero": {
+    "eyebrow": "拾光 · 收藏每一帧",
+    "title": "把日子过成画",
+    "sub": "分类收藏 · 慢慢翻阅"
+  },
+  "cta": "进入图库",
+  "cats": [
+    {
+      "id": "all",
+      "name": "全部"
     },
-    cta: '进入图库',
-    cats: [
-        {id: 'all', name: '全部'},
-        {id: 'life', name: '生活'},
-        {id: 'view', name: '风景'},
-        {id: 'food', name: '美食'}
-    ],
-    imgs: [
-        {f: 'img/demo1.jpg', t: '山谷晨光', c: 'view'},
-        {f: 'img/demo2.jpg', t: '一杯咖啡', c: 'food'},
-        {f: 'img/demo3.jpg', t: '傍晚散步', c: 'life'}
-    ],
-    musics: [],
-    fx: []
+    {
+      "id": "life",
+      "name": "生活"
+    },
+    {
+      "id": "view",
+      "name": "风景"
+    },
+    {
+      "id": "food",
+      "name": "美食"
+    }
+  ],
+  "imgs": [
+    {
+      "f": "img/demo1.jpg",
+      "t": "山谷晨光",
+      "c": "view"
+    },
+    {
+      "f": "img/demo2.jpg",
+      "t": "一杯咖啡",
+      "c": "food"
+    },
+    {
+      "f": "img/demo3.jpg",
+      "t": "傍晚散步",
+      "c": "life"
+    }
+  ],
+  "musics": [],
+  "fx": []
 };
 var ASSET_BASE = '';
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
@@ -291,7 +315,7 @@ body {
 (function () {
     var C = CFG;
     document.body.setAttribute('data-bg', C.bg || 'cream');
-    document.title = C.name + ' · ' + C.uiSub;
+    document.title = C.name + (C.uiSub && C.uiSub !== C.name ? ' · ' + C.uiSub : '');
     var meta = document.querySelector('meta[name="description"]');
     if (meta) meta.content = C.intro;
 
