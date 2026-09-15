@@ -138,7 +138,19 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 <!-- 背景 -->
 <div class="panel" id="p-bg">
     <div class="sec">
-        <h3>选择背景（前台即时生效）</h3>
+        <h3>背景管理</h3>
+        <div class="opt">
+            <span class="nm2">自动切换背景</span>
+            <div class="switch" id="bgAutoSw" onclick="toggleBgAuto()"><i></i></div>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后前台每隔 8 秒自动轮换一张背景</div>
+        <div class="btn-row">
+            <button class="btn primary" id="btnUpBg" type="button">上传背景</button>
+            <button class="btn" id="btnUpBgGif" type="button">上传动图</button>
+        </div>
+        <input type="file" id="upBg" accept="image/*" style="display:none;">
+        <input type="file" id="upBgGif" accept="image/gif" style="display:none;">
+        <div class="lbl">选择背景（前台即时生效，自定义背景可删除）</div>
         <div id="bgList"></div>
     </div>
 </div>
@@ -189,6 +201,10 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 <div class="panel" id="p-plg">
     <div class="sec">
         <h3>特效插件（开启后前台加载）</h3>
+        <div class="btn-row">
+            <button class="btn primary" id="btnUpPlg" type="button">上传插件（js）</button>
+        </div>
+        <input type="file" id="upPlg" accept=".js,application/javascript,text/javascript" style="display:none;">
         <div id="plgList"></div>
     </div>
 </div>
@@ -547,23 +563,70 @@ function audioDel(i) {
 }
 
 /* ================= 背景 ================= */
-var BGS = [
-    { id: 'cream',  name: '奶油暖光', css: 'linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)' },
-    { id: 'forest', name: '墨绿森林', css: 'linear-gradient(165deg,#24402e,#14271b 60%,#0c1a11)' },
-    { id: 'night',  name: '暗夜蓝紫', css: 'linear-gradient(165deg,#232a4d,#141731 60%,#0b0d1d)' },
-    { id: 'sakura', name: '樱花粉白', css: 'linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)' },
-    { id: 'aurora', name: '极光青蓝', css: 'linear-gradient(165deg,#0d3f46,#0a2a33 55%,#071c24)' }
+var DEFAULT_BGS = [
+    { id: 'cream',  name: '奶油暖光', type: 'grad', css: 'linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)' },
+    { id: 'forest', name: '墨绿森林', type: 'grad', css: 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)' },
+    { id: 'night',  name: '暗夜蓝紫', type: 'grad', css: 'linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)' },
+    { id: 'sakura', name: '樱花粉白', type: 'grad', css: 'linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)' },
+    { id: 'aurora', name: '极光青蓝', type: 'grad', css: 'linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)' }
 ];
+function ensureBgs() {
+    if (!cfg.bgs || !cfg.bgs.length) cfg.bgs = DEFAULT_BGS.map(function (b) { return JSON.parse(JSON.stringify(b)); });
+}
+function bgPreview(b) {
+    if (b.type === 'img') return 'url(https://raw.githubusercontent.com/' + REPO + '/main/' + b.url + ') center/cover';
+    return b.css;
+}
 function renderBgs() {
+    ensureBgs();
+    document.getElementById('bgAutoSw').className = 'switch' + (cfg.bgAuto ? ' on' : '');
     var box = document.getElementById('bgList');
     box.innerHTML = '';
-    BGS.forEach(function (b) {
+    cfg.bgs.forEach(function (b) {
         var d = document.createElement('div');
         d.className = 'bg-card' + (cfg.bg === b.id ? ' on' : '');
-        d.innerHTML = '<div class="bg-prev" style="background:' + b.css + ';"></div><div style="font-size:13px;letter-spacing:.12em;">' + b.name + '</div>';
+        var tag = b.type === 'img' ? '<span style="font-size:10px;color:var(--accent);letter-spacing:.08em;">' + (b.url && /\.gif$/i.test(b.url) ? '动图' : '图片') + '</span>' : '';
+        d.innerHTML = '<div class="bg-prev" style="background:' + bgPreview(b) + ';"></div>' +
+            '<div style="font-size:13px;letter-spacing:.12em;">' + b.name + ' ' + tag + '</div>' +
+            '<button class="btn sm danger" style="margin-top:6px;" onclick="event.stopPropagation();delBg(\'' + b.id + '\')">删除</button>';
         d.onclick = function () { cfg.bg = b.id; saveIdx(function () { renderBgs(); }); };
         box.appendChild(d);
     });
+}
+function delBg(id) {
+    if (!confirm('删除这个背景？删除后不可恢复（当前使用会自动切到第一个）')) return;
+    ensureBgs();
+    cfg.bgs = cfg.bgs.filter(function (b) { return b.id !== id; });
+    if (cfg.bg === id) cfg.bg = cfg.bgs.length ? cfg.bgs[0].id : 'cream';
+    saveIdx(function () { renderBgs(); });
+}
+function toggleBgAuto() {
+    cfg.bgAuto = !cfg.bgAuto;
+    saveIdx(function () { renderBgs(); });
+}
+document.getElementById('btnUpBg').onclick = function () { document.getElementById('upBg').click(); };
+document.getElementById('btnUpBgGif').onclick = function () { document.getElementById('upBgGif').click(); };
+document.getElementById('upBg').onchange = function () { uploadBgFiles(this.files); this.value = ''; };
+document.getElementById('upBgGif').onchange = function () { uploadBgFiles(this.files); this.value = ''; };
+function uploadBgFiles(files) {
+    var arr = Array.prototype.slice.call(files);
+    if (!arr.length) return;
+    var i = 0;
+    (function next() {
+        if (i >= arr.length) { msg('背景已上传，正在保存配置'); return; }
+        var f = arr[i]; i++;
+        var nm = f.name.replace(/[^\w.\u4e00-\u9fa5-]/g, '_');
+        var path = 'bg/' + nm;
+        var rd = new FileReader();
+        rd.onload = function () {
+            var b64 = rd.result.split(',')[1];
+            api('/contents/' + path, 'PUT', { message: 'Add bg ' + nm, content: b64 }).then(function (r) {
+                cfg.bgs.push({ id: 'bg' + Date.now().toString(36) + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
+                saveIdx(function () { renderBgs(); next(); });
+            }).catch(function (e) { msg('背景上传失败'); next(); });
+        };
+        rd.readAsDataURL(f);
+    })();
 }
 
 /* ================= 设置 ================= */
@@ -653,6 +716,27 @@ function toggleFx(p) {
     else cfg.fx.splice(ix, 1);
     saveIdx(function () { renderPlg(); });
 }
+document.getElementById('btnUpPlg').onclick = function () { document.getElementById('upPlg').click(); };
+document.getElementById('upPlg').onchange = function () {
+    var files = Array.prototype.slice.call(this.files);
+    this.value = '';
+    if (!files.length) return;
+    var i = 0;
+    (function next() {
+        if (i >= files.length) { msg('插件已上传'); renderPlg(); return; }
+        var f = files[i]; i++;
+        var nm = f.name.replace(/[^\w.\u4e00-\u9fa5-]/g, '_');
+        if (!/\.js$/i.test(nm)) nm += '.js';
+        var rd = new FileReader();
+        rd.onload = function () {
+            var b64 = rd.result.split(',')[1];
+            api('/contents/js/' + nm, 'PUT', { message: 'Add plugin ' + nm, content: b64 })
+                .then(function () { next(); })
+                .catch(function () { msg('插件上传失败'); next(); });
+        };
+        rd.readAsDataURL(f);
+    })();
+};
 
 /* ================= 通用弹层 ================= */
 function showSheet(html) {
