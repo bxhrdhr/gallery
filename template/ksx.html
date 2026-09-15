@@ -38,7 +38,6 @@ var CFG = {
 };
 var ASSET_BASE = 'https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
-<script>window.addEventListener('error', function (e) { var d = document.createElement('div'); d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#c00;color:#fff;font-size:13px;padding:6px'; d.textContent = 'ERR: ' + (e.message || e.type) + ' @ ' + ((e.filename || '').split('/').pop() || 'inline') + ':' + e.lineno; document.body.appendChild(d); });</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>/* 站点图标跟随资源基准，本地打开时不再请求外链 */
 (function () {
@@ -1161,7 +1160,6 @@ const showImage = (index, dir) => {
         
         const img = new Image();
         img.decoding = 'async';
-        img.loading = 'lazy';
         
         if (globalIndex < 8) {
             img.fetchPriority = "high";
@@ -1200,10 +1198,14 @@ const showImage = (index, dir) => {
 
         w.appendChild(img);
         frag.appendChild(w);
-        scrollObs.observe(w);
     });
 
     container.appendChild(frag);
+    /* 挂载后再观察/加载：首屏立即加载，其余交给滚动懒加载 */
+    Array.prototype.forEach.call(container.querySelectorAll('.img-wrap'), function (w, i) {
+        scrollObs.observe(w);
+        if (i < 12) w.loadImg();
+    });
     v.onclick = closeViewer;
 };
 renderAllPerfectly();
