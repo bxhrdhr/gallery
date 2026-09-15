@@ -15,82 +15,30 @@ var CFG = {
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
-    {
-      "id": "cream",
-      "name": "奶油暖光",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"
-    },
-    {
-      "id": "forest",
-      "name": "墨绿森林",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
-    },
-    {
-      "id": "night",
-      "name": "暗夜蓝紫",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
-    },
-    {
-      "id": "sakura",
-      "name": "樱花粉白",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "aurora",
-      "name": "极光青蓝",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
-    }
+    { "id": "cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)" },
+    { "id": "forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)" },
+    { "id": "night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)" },
+    { "id": "sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)" },
+    { "id": "aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)" }
   ],
-  "hero": {
-    "eyebrow": "拾光 · 收藏每一帧",
-    "title": "把日子过成画",
-    "sub": "分类收藏 · 慢慢翻阅",
-    "cta": "进入图库"
-  },
+  "hero": { "eyebrow": "拾光 · 收藏每一帧", "title": "把日子过成画", "sub": "分类收藏 · 慢慢翻阅", "cta": "进入图库" },
   "cats": [
-    {
-      "id": "all",
-      "name": "全部"
-    },
-    {
-      "id": "life",
-      "name": "生活"
-    },
-    {
-      "id": "view",
-      "name": "风景"
-    },
-    {
-      "id": "food",
-      "name": "美食"
-    }
+    { "id": "all", "name": "全部" },
+    { "id": "life", "name": "生活" },
+    { "id": "view", "name": "风景" },
+    { "id": "food", "name": "美食" }
   ],
   "imgs": [
-    {
-      "f": "img/demo1.jpg",
-      "t": "山谷晨光",
-      "c": "view",
-      "_sha": "8cc8990b18e1fc4c7fbedbf6c88bb6f2e1dea549"
-    },
-    {
-      "f": "img/demo2.jpg",
-      "t": "一杯咖啡",
-      "c": "food",
-      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
-    },
-    {
-      "f": "img/demo3.jpg",
-      "t": "傍晚散步",
-      "c": "life",
-      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a"
-    }
+    { "f": "img/demo1.jpg", "t": "山谷晨光", "c": "view" },
+    { "f": "img/demo2.jpg", "t": "一杯咖啡", "c": "food" },
+    { "f": "img/demo3.jpg", "t": "傍晚散步", "c": "life" }
   ],
-  "musics": [],
+  "musics": [
+    { "f": "mp3/尾季篇.mp3", "name": "尾季篇" },
+    { "f": "mp3/失去后才明白.mp3", "name": "失去后才明白" },
+    { "f": "mp3/温柔的徘徊.mp3", "name": "温柔的徘徊" },
+    { "f": "mp3/落日.mp3", "name": "落日" }
+  ],
   "fx": []
 };
 var ASSET_BASE = 'https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
@@ -375,7 +323,7 @@ img:not([src]), img[src=""], img:-moz-broken {
 }
 
 
-#ml {
+#ml, #catMenu {
     position: fixed; bottom: 95px; left: 50%;
     transform: translateX(-50%) translateY(20px);
     width: 280px; max-height: 45vh;
@@ -389,7 +337,7 @@ img:not([src]), img[src=""], img:-moz-broken {
     transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.02);
 }
-#ml.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#ml.show, #catMenu.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .mi {
     padding: 12px 16px; font-size: 13px; color: var(--text-secondary);
     cursor: pointer; transition: all 0.25s; font-weight: 300;
@@ -405,6 +353,10 @@ img:not([src]), img[src=""], img:-moz-broken {
     background: var(--accent-gold); border-radius: 50%;
     margin-right: 10px; box-shadow: 0 0 8px var(--accent-gold);
 }
+.mi-hd { font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.35); cursor: default; text-transform: uppercase; }
+.mi-hd:hover { background: none; padding-left: 16px; color: rgba(255,255,255,0.35); }
+/* 分类移到三条杠里，顶部不再显示 */
+#catbar { display: none !important; }
 
 .t {
     position: relative;
@@ -739,6 +691,7 @@ body.intro-lock { overflow: hidden; }
 <div id="v"><img></div>
 <div class="t"></div>
 <div id="ml"></div>
+<div id="catMenu"></div>
 
 <div class="nav-container">
     <div class="nav">
@@ -761,7 +714,7 @@ body.intro-lock { overflow: hidden; }
     </div>
 </div>
 
-<audio id="a" hidden preload="auto" playsinline x-webkit-airplay="allow" crossorigin="anonymous"></audio>
+<audio id="a" hidden preload="auto" playsinline x-webkit-airplay="allow"></audio>
 
 <script>
 !function(){
@@ -802,9 +755,30 @@ body.intro-lock { overflow: hidden; }
         for (var i = 0; i < CFG.cats.length; i++) if (CFG.cats[i].id === catId) return CFG.cats[i].name;
         return catId;
     }
-    function renderCatBar() {
-        var cb = document.getElementById('catbar');
-        if (!cb) return;
+    function catMenuEl() { return document.getElementById('catMenu'); }
+    function closeCatMenu() {
+        var cm = catMenuEl();
+        if (cm && cm.style.display === 'flex') {
+            cm.classList.remove('show');
+            setTimeout(function () { cm.style.display = 'none'; }, 300);
+        }
+    }
+    function openCatMenu() {
+        var cm = catMenuEl();
+        if (!cm) return;
+        renderCatMenu();
+        cm.style.display = 'flex';
+        requestAnimationFrame(function () { cm.classList.add('show'); });
+    }
+    function renderCatMenu() {
+        var cm = catMenuEl();
+        if (!cm) return;
+        cm.innerHTML = '';
+        /* 分类分区 */
+        var hd = document.createElement('div');
+        hd.className = 'mi mi-hd';
+        hd.textContent = '分类';
+        cm.appendChild(hd);
         var cats;
         if (hasCfgCats()) {
             cats = CFG.cats.map(function (c) { return { id: c.id, name: c.name }; });
@@ -816,10 +790,9 @@ body.intro-lock { overflow: hidden; }
                 if (seen.indexOf(c2) === -1) { seen.push(c2); cats.push({ id: c2, name: c2 }); }
             });
         }
-        cb.innerHTML = '';
         cats.forEach(function (cc) {
             var b = document.createElement('button');
-            b.className = 'catbtn' + (cc.id === curCat ? ' on' : '');
+            b.className = 'mi' + (cc.id === curCat ? ' act' : '');
             b.textContent = cc.name;
             b.type = 'button';
             b.onclick = function () {
@@ -832,10 +805,26 @@ body.intro-lock { overflow: hidden; }
                 container.innerHTML = '';
                 renderAllPerfectly();
                 if (v) { v.style.display = 'none'; document.body.style.overflow = ''; }
-                renderCatBar();
+                closeCatMenu();
+                renderCatMenu();
             };
-            cb.appendChild(b);
+            cm.appendChild(b);
         });
+        /* 音乐分区 */
+        if (musicFiles.length && t.length) {
+            var hd2 = document.createElement('div');
+            hd2.className = 'mi mi-hd';
+            hd2.textContent = '音乐';
+            cm.appendChild(hd2);
+            t.forEach(function (s, i) {
+                var d = document.createElement('div');
+                d.className = 'mi' + (i === c ? ' act' : '');
+                d.setAttribute('data-music', '1');
+                d.textContent = s.n;
+                d.onclick = function () { ld(i); closeCatMenu(); };
+                cm.appendChild(d);
+            });
+        }
     }
 
     
@@ -945,26 +934,24 @@ body.intro-lock { overflow: hidden; }
     
     ls.onclick=(e)=>{
         e.stopPropagation();
-        if(ml.style.display === 'flex') {
-            ml.classList.remove('show');
-            setTimeout(()=>ml.style.display='none', 300);
+        var cm = document.getElementById('catMenu');
+        if(!cm) return;
+        if(cm.style.display === 'flex') {
+            closeCatMenu();
         } else {
-            ml.style.display = 'flex';
-            requestAnimationFrame(()=>ml.classList.add('show'));
-            const act = ml.querySelector('.act');
-            if(act) act.scrollIntoView({block:"center"});
+            openCatMenu();
         }
     };
 
     window.addEventListener('click', (e) => {
-        if(ml.style.display === 'flex' && !e.target.closest('#list') && !e.target.closest('#ml')) {
-            ml.classList.remove('show');
-            setTimeout(()=>ml.style.display='none', 300);
+        var cm = document.getElementById('catMenu');
+        if(cm && cm.style.display === 'flex' && !e.target.closest('#list') && !e.target.closest('#catMenu')) {
+            closeCatMenu();
         }
     });
 
     const upd=()=>{
-        Array.from(ml.children).forEach((el,i)=>{
+        Array.from(document.querySelectorAll('#catMenu [data-music]')).forEach((el,i)=>{
             el.className = i===c ? 'mi act' : 'mi';
         });
         if(t[c] && 'mediaSession' in navigator){
@@ -1027,13 +1014,6 @@ body.intro-lock { overflow: hidden; }
             n: musicNames[mi] || f.replace(/\.mp3$/i, '').replace(/[^\u4e00-\u9fa5]/g,'') || f.replace(/\.mp3$/i, '')
         }));
         
-        t.forEach((s,i)=>{
-            let d=document.createElement('div');
-            d.className='mi';
-            d.textContent=s.n;
-            d.onclick=()=>{ld(i);ml.classList.remove('show');setTimeout(()=>ml.style.display='none',300)};
-            ml.appendChild(d);
-        });
         u.src = t[0].u; 
         if('mediaSession' in navigator){
             navigator.mediaSession.metadata = new MediaMetadata({
@@ -1266,7 +1246,7 @@ const showImage = (index, dir) => {
     v.onclick = closeViewer;
 };
 renderAllPerfectly();
-renderCatBar();   /* 页面切换模板新增：渲染自动分类条 */
+renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里 */
 
     q.onclick=pp;
     b.onclick=()=>{ld(c-1)};
