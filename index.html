@@ -238,105 +238,41 @@ a, button { -webkit-tap-highlight-color: transparent; }
 var CFG = {
   "name": "时光图库",
   "intro": "一座小小的图库，收藏生活的风景与故事。",
+  "pageMode": "gallery",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "bgt",
+  "bg": "cream",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
-    {
-      "id": "cream",
-      "name": "奶油暖光",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"
-    },
-    {
-      "id": "forest",
-      "name": "墨绿森林",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
-    },
-    {
-      "id": "night",
-      "name": "暗夜蓝紫",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
-    },
-    {
-      "id": "sakura",
-      "name": "樱花粉白",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "aurora",
-      "name": "极光青蓝",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
-    },
-    {
-      "id": "bgt",
-      "name": "测试背景",
-      "type": "img",
-      "url": "bg/bg_test.jpg"
-    }
+    { "id": "cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)" },
+    { "id": "forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)" },
+    { "id": "night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)" },
+    { "id": "sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)" },
+    { "id": "aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)" }
   ],
-  "hero": {
-    "eyebrow": "拾光 · 收藏每一帧",
-    "title": "把日子过成画",
-    "sub": "分类收藏 · 慢慢翻阅",
-    "cta": "进入图库"
-  },
+  "hero": { "eyebrow": "拾光 · 收藏每一帧", "title": "把日子过成画", "sub": "分类收藏 · 慢慢翻阅", "cta": "进入图库" },
   "cats": [
-    {
-      "id": "all",
-      "name": "全部"
-    },
-    {
-      "id": "life",
-      "name": "生活"
-    },
-    {
-      "id": "view",
-      "name": "风景"
-    },
-    {
-      "id": "food",
-      "name": "美食"
-    }
+    { "id": "all", "name": "全部" },
+    { "id": "life", "name": "生活" },
+    { "id": "view", "name": "风景" },
+    { "id": "food", "name": "美食" }
   ],
   "imgs": [
-    {
-      "f": "img/demo1.jpg",
-      "t": "山谷晨光",
-      "c": "view",
-      "_sha": "8cc8990b18e1fc4c7fbedbf6c88bb6f2e1dea549"
-    },
-    {
-      "f": "img/demo2.jpg",
-      "t": "一杯咖啡",
-      "c": "food",
-      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
-    },
-    {
-      "f": "img/demo3.jpg",
-      "t": "傍晚散步",
-      "c": "life",
-      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a"
-    }
+    { "f": "img/demo1.jpg", "t": "山谷晨光", "c": "view" },
+    { "f": "img/demo2.jpg", "t": "一杯咖啡", "c": "food" },
+    { "f": "img/demo3.jpg", "t": "傍晚散步", "c": "life" }
   ],
   "musics": [],
-  "fx": [
-    "js/全屏/樱花特效.js",
-    "js/全屏/飞雪特效.js",
-    "js/图片/滤镜特效.js",
-    "js/文字/文字呼吸特效.js",
-    "js/点击/水波纹点击特效.js",
-    "js/玻璃雨珠/玻璃雨珠.js"
-  ]
+  "fx": []
 };
 var ASSET_BASE = '';
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
+
+/* ---------- 页面切换：后台可切换前台为旧站页面（内容与旧站同步） ---------- */
+if ((CFG.pageMode || 'gallery') === 'ksx') {
+    location.replace(ASSET_BASE + 'template/ksx.html');
+}
 
 var C = CFG, bgs = C.bgs || [], curCat = 'all', curIdx = 0, list = [], bgTimer = null, bgIdx = 0;
 
