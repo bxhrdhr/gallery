@@ -71,12 +71,6 @@ var CFG = {
   ],
   "imgs": [
     {
-      "f": "img/1789468891861_567.jpg",
-      "t": "深圳一日游",
-      "c": "life",
-      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
-    },
-    {
       "f": "img/demo1.jpg",
       "t": "山谷晨光",
       "c": "view",
@@ -87,6 +81,12 @@ var CFG = {
       "t": "一杯咖啡",
       "c": "food",
       "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
+    },
+    {
+      "f": "img/1789468891861_567.jpg",
+      "t": "深圳一日游",
+      "c": "life",
+      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
     }
   ],
   "musics": [
@@ -1530,7 +1530,7 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
     try {
         if (typeof CFG !== 'undefined' && CFG.tplRain === false) return;
         var s = document.createElement('script');
-        s.src = './js/玻璃雨珠/玻璃雨珠.js?v=5';
+        s.src = '../js/玻璃雨珠/玻璃雨珠.js?v=6';
         s.setAttribute('data-weather', 'rain');
         s.async = false;
         document.head.appendChild(s);
