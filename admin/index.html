@@ -167,20 +167,36 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 <!-- 背景 -->
 <div class="panel" id="p-bg">
     <div class="sec">
-        <h3>背景管理</h3>
+        <h3>时光图库背景</h3>
         <div class="opt">
             <span class="nm2">自动切换背景</span>
             <div class="switch" id="bgAutoSw" onclick="toggleBgAuto()"><i></i></div>
         </div>
-        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后前台每隔 8 秒自动轮换一张背景；背景同时应用于「时光图库」与「旧站风格」两个页面</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后「时光图库」首页每隔 8 秒自动轮换一张背景</div>
         <div class="btn-row">
             <button class="btn primary" id="btnUpBg" type="button">上传背景</button>
             <button class="btn" id="btnUpBgGif" type="button">上传动图</button>
         </div>
         <input type="file" id="upBg" accept="image/*" style="display:none;">
         <input type="file" id="upBgGif" accept="image/gif" style="display:none;">
-        <div class="lbl">选择背景（前台即时生效，自定义背景可删除；图片/动图背景会替换旧站风格的雨珠特效背景）</div>
+        <div class="lbl">选择背景（首页即时生效，自定义背景可删除）</div>
         <div id="bgList"></div>
+    </div>
+    <div class="sec" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px;">
+        <h3>旧站模板背景</h3>
+        <div class="opt">
+            <span class="nm2">自动切换背景</span>
+            <div class="switch" id="tplBgAutoSw" onclick="toggleTplBgAuto()"><i></i></div>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">开启后「旧站风格」页面每隔 8 秒自动轮换一张背景</div>
+        <div class="btn-row">
+            <button class="btn primary" id="btnUpTplBg" type="button">上传背景</button>
+            <button class="btn" id="btnUpTplBgGif" type="button">上传动图</button>
+        </div>
+        <input type="file" id="upTplBg" accept="image/*" style="display:none;">
+        <input type="file" id="upTplBgGif" accept="image/gif" style="display:none;">
+        <div class="lbl">选择背景（旧站风格页面即时生效，自定义背景可删除；图片/动图背景会替换雨珠特效）</div>
+        <div id="tplBgList"></div>
     </div>
 </div>
 
@@ -363,7 +379,7 @@ function loadAll() {
         if (tpl && tpl.up > idx.up) newer = tpl;
         cfg = parseCfg(newer.html);
         document.getElementById('hdRefresh').textContent = '↻';
-        fillBase(); fillHero(); fill404(); renderGrid(); renderAudio(); renderBgs(); renderPlg(); fillCatSel();
+        fillBase(); fillHero(); fill404(); renderGrid(); renderAudio(); renderBgs(); renderTplBgs(); renderPlg(); fillCatSel();
     }).catch(function () { msg('加载失败，请检查令牌权限'); });
 }
 document.getElementById('hdRefresh').onclick = loadAll;
@@ -693,6 +709,69 @@ function uploadBgFiles(files) {
             api('/contents/' + path, 'PUT', { message: 'Add bg ' + nm, content: b64 }).then(function (r) {
                 cfg.bgs.push({ id: 'bg' + Date.now().toString(36) + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
                 saveIdx(function () { renderBgs(); next(); });
+            }).catch(function (e) { msg('背景上传失败'); next(); });
+        };
+        rd.readAsDataURL(f);
+    })();
+}
+
+/* ================= 旧站模板背景（独立于时光图库背景） ================= */
+var DEFAULT_TEMPLATE_BGS = [
+    { id: 'tpl-forest', name: '墨绿森林', type: 'grad', css: 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)' },
+    { id: 'tpl-night',  name: '暗夜蓝紫', type: 'grad', css: 'linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)' },
+    { id: 'tpl-aurora', name: '极光青蓝', type: 'grad', css: 'linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)' },
+    { id: 'tpl-sakura', name: '樱花粉白', type: 'grad', css: 'linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)' }
+];
+function ensureTplBgs() {
+    if (!cfg.tplBgs || !cfg.tplBgs.length) cfg.tplBgs = DEFAULT_TEMPLATE_BGS.map(function (b) { return JSON.parse(JSON.stringify(b)); });
+    if (!cfg.tplBg) cfg.tplBg = cfg.tplBgs[0].id;
+}
+function renderTplBgs() {
+    ensureTplBgs();
+    document.getElementById('tplBgAutoSw').className = 'switch' + (cfg.tplBgAuto ? ' on' : '');
+    var box = document.getElementById('tplBgList');
+    box.innerHTML = '';
+    cfg.tplBgs.forEach(function (b) {
+        var d = document.createElement('div');
+        d.className = 'bg-card' + (cfg.tplBg === b.id ? ' on' : '');
+        var tag = b.type === 'img' ? '<span style="font-size:10px;color:var(--accent);letter-spacing:.08em;">' + (b.url && /\.gif$/i.test(b.url) ? '动图' : '图片') + '</span>' : '';
+        d.innerHTML = '<div class="bg-prev" style="background:' + bgPreview(b) + ';"></div>' +
+            '<div style="font-size:13px;letter-spacing:.12em;">' + b.name + ' ' + tag + '</div>' +
+            '<button class="btn sm danger" style="margin-top:6px;" onclick="event.stopPropagation();delTplBg(\'' + b.id + '\')">删除</button>';
+        d.onclick = function () { cfg.tplBg = b.id; saveIdx(function () { renderTplBgs(); }); };
+        box.appendChild(d);
+    });
+}
+function delTplBg(id) {
+    if (!confirm('删除这个背景？删除后不可恢复（当前使用会自动切到第一个）')) return;
+    ensureTplBgs();
+    cfg.tplBgs = cfg.tplBgs.filter(function (b) { return b.id !== id; });
+    if (cfg.tplBg === id) cfg.tplBg = cfg.tplBgs.length ? cfg.tplBgs[0].id : 'tpl-forest';
+    saveIdx(function () { renderTplBgs(); });
+}
+function toggleTplBgAuto() {
+    cfg.tplBgAuto = !cfg.tplBgAuto;
+    saveIdx(function () { renderTplBgs(); });
+}
+document.getElementById('btnUpTplBg').onclick = function () { document.getElementById('upTplBg').click(); };
+document.getElementById('btnUpTplBgGif').onclick = function () { document.getElementById('upTplBgGif').click(); };
+document.getElementById('upTplBg').onchange = function () { uploadTplBgFiles(this.files); this.value = ''; };
+document.getElementById('upTplBgGif').onchange = function () { uploadTplBgFiles(this.files); this.value = ''; };
+function uploadTplBgFiles(files) {
+    var arr = Array.prototype.slice.call(files);
+    if (!arr.length) return;
+    var i = 0;
+    (function next() {
+        if (i >= arr.length) { msg('背景已上传，正在保存配置'); return; }
+        var f = arr[i]; i++;
+        var nm = f.name.replace(/[^\w.\u4e00-\u9fa5-]/g, '_');
+        var path = 'bg/' + nm;
+        var rd = new FileReader();
+        rd.onload = function () {
+            var b64 = rd.result.split(',')[1];
+            api('/contents/' + path, 'PUT', { message: 'Add tpl bg ' + nm, content: b64 }).then(function (r) {
+                cfg.tplBgs.push({ id: 'tplb' + Date.now().toString(36) + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
+                saveIdx(function () { renderTplBgs(); next(); });
             }).catch(function (e) { msg('背景上传失败'); next(); });
         };
         rd.readAsDataURL(f);
