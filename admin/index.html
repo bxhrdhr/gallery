@@ -160,13 +160,19 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
     <div class="sec">
         <div class="btn-row">
             <button class="btn primary" id="btnUpA" type="button">上传音乐</button>
+            <button class="btn" id="btnLibA" type="button">素材库</button>
         </div>
         <input type="file" id="upFilesA" accept="audio/*" multiple style="display:none;">
     </div>
     <div class="sec">
-        <h3>音乐列表（点击操作）</h3>
+        <h3>音乐列表（不想要的音乐先「禁用」进素材库，需要时再恢复）</h3>
         <div id="audioList"></div>
         <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="audioEmpty">加载中...</div>
+    </div>
+    <div class="sec" id="libSecA" style="display:none;">
+        <h3>音乐素材库（已禁用的音乐不播放，可恢复或彻底删除）</h3>
+        <div id="libListA"></div>
+        <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="libEmptyA">素材库是空的</div>
     </div>
 </div>
 
@@ -595,10 +601,15 @@ function restoreImg(i) {
 function libDel(i) {
     var it = cfg.imgs[i];
     if (!confirm('彻底删除「' + it.t + '」？文件将永久删除，无法恢复。')) return;
-    api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
+    /* 先实时获取文件最新 sha 再删除，避免缓存 sha 失效导致删除失败 */
+    api('/contents/' + it.f).then(function (d) {
+        return api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: d.sha });
+    }).then(function () {
         cfg.imgs.splice(i, 1);
         saveIdx(function () { msg('已彻底删除'); renderLib(); renderGrid(); });
-    }).catch(function () { msg('删除失败，可稍后重试'); });
+    }).catch(function (e) {
+        msg('删除失败' + ((e && e.status) ? '（HTTP ' + e.status + '）' : '') + '，可稍后重试');
+    });
 }
 
 /* ================= 分类管理 ================= */
@@ -665,27 +676,68 @@ document.getElementById('upFilesA').onchange = function () {
 function renderAudio() {
     var box = document.getElementById('audioList');
     box.innerHTML = '';
-    document.getElementById('audioEmpty').style.display = cfg.musics.length ? 'none' : 'block';
-    document.getElementById('audioEmpty').textContent = cfg.musics.length ? '' : '还没有音乐，点「上传音乐」添加';
+    var shown = cfg.musics.filter(function (m) { return !m.disabled; });
+    document.getElementById('audioEmpty').style.display = shown.length ? 'none' : 'block';
+    document.getElementById('audioEmpty').textContent = shown.length ? '' : '还没有音乐，点「上传音乐」添加';
     cfg.musics.forEach(function (m, i) {
+        if (m.disabled) return;
         var d = document.createElement('div');
         d.className = 'opt';
         d.innerHTML = '<span class="nm2">' + m.name + '</span>' +
             '<button class="btn sm" onclick="audioUp(' + i + ')">上移</button>' +
             '<button class="btn sm" onclick="audioDown(' + i + ')">下移</button>' +
-            '<button class="btn sm danger" onclick="audioDel(' + i + ')">删除</button>';
+            '<button class="btn sm danger" onclick="audioDisable(' + i + ')">禁用（移到素材库）</button>';
         box.appendChild(d);
     });
 }
 function audioUp(i) { if (i <= 0) return; var t = cfg.musics[i]; cfg.musics[i] = cfg.musics[i - 1]; cfg.musics[i - 1] = t; saveIdx(function () { renderAudio(); }); }
 function audioDown(i) { if (i >= cfg.musics.length - 1) return; var t = cfg.musics[i]; cfg.musics[i] = cfg.musics[i + 1]; cfg.musics[i + 1] = t; saveIdx(function () { renderAudio(); }); }
-function audioDel(i) {
+function audioDisable(i) {
     var m = cfg.musics[i];
-    if (!confirm('删除音乐「' + m.name + '」？')) return;
-    api('/contents/' + m.f, 'DELETE', { message: 'Del ' + m.f, sha: m._sha }).then(function () {
+    if (!confirm('把音乐「' + m.name + '」禁用？禁用后不播放，会放到音乐素材库，需要时可恢复。')) return;
+    m.disabled = true;
+    saveIdx(function () { renderAudio(); });
+}
+
+/* ================= 音乐素材库（已禁用的音乐：恢复 / 彻底删除） ================= */
+document.getElementById('btnLibA').onclick = function () {
+    var sec = document.getElementById('libSecA');
+    var show = sec.style.display !== 'block';
+    sec.style.display = show ? 'block' : 'none';
+    document.getElementById('btnLibA').classList.toggle('on', show);
+    if (show) renderLibA();
+};
+function renderLibA() {
+    var box = document.getElementById('libListA');
+    box.innerHTML = '';
+    var lib = [];
+    cfg.musics.forEach(function (m, i) { if (m.disabled) lib.push({ m: m, i: i }); });
+    document.getElementById('libEmptyA').style.display = lib.length ? 'none' : 'block';
+    document.getElementById('libEmptyA').textContent = lib.length ? '' : '音乐素材库是空的——音乐被「禁用」后会出现在这里';
+    lib.forEach(function (o) {
+        var d = document.createElement('div');
+        d.className = 'opt';
+        d.innerHTML = '<span class="nm2" style="opacity:.6;">' + o.m.name + '</span>' +
+            '<button class="btn sm primary" onclick="audioRestore(' + o.i + ')">恢复</button>' +
+            '<button class="btn sm danger" onclick="audioLibDel(' + o.i + ')">彻底删除</button>';
+        box.appendChild(d);
+    });
+}
+function audioRestore(i) {
+    cfg.musics[i].disabled = false;
+    saveIdx(function () { msg('已恢复，音乐回到播放列表'); renderLibA(); renderAudio(); });
+}
+function audioLibDel(i) {
+    var m = cfg.musics[i];
+    if (!confirm('彻底删除音乐「' + m.name + '」？文件将永久删除，无法恢复。')) return;
+    api('/contents/' + m.f).then(function (d) {
+        return api('/contents/' + m.f, 'DELETE', { message: 'Del ' + m.f, sha: d.sha });
+    }).then(function () {
         cfg.musics.splice(i, 1);
-        saveIdx(function () { renderAudio(); });
-    }).catch(function () { msg('删除失败'); });
+        saveIdx(function () { msg('已彻底删除'); renderLibA(); renderAudio(); });
+    }).catch(function (e) {
+        msg('删除失败' + ((e && e.status) ? '（HTTP ' + e.status + '）' : '') + '，可稍后重试');
+    });
 }
 
 /* ================= 背景 ================= */
