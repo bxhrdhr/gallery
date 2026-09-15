@@ -132,20 +132,26 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
             <button class="btn primary" id="btnUp" type="button">上传图片</button>
             <button class="btn" id="btnCats" type="button">管理分类</button>
             <button class="btn" id="btnMulti" type="button">多选</button>
+            <button class="btn" id="btnLib" type="button">素材库</button>
         </div>
         <input type="file" id="upFiles" accept="image/*" multiple style="display:none;">
         <div class="lbl">当前分类</div>
         <select id="upCat"></select>
     </div>
     <div class="sec">
-        <h3>图片列表（点击操作）</h3>
+        <h3>图片列表（点击操作；不想要的图片先「禁用」进素材库，需要时再恢复）</h3>
         <div class="grid" id="imgGrid"></div>
         <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="imgEmpty">加载中...</div>
         <div class="btn-row" id="multiBar" style="display:none;">
-            <button class="btn danger" id="btnMDel" type="button">删除所选</button>
+            <button class="btn danger" id="btnMDel" type="button">禁用所选</button>
             <button class="btn" id="btnMMove" type="button">移动到分类</button>
             <button class="btn" id="btnMCancel" type="button">取消</button>
         </div>
+    </div>
+    <div class="sec" id="libSec" style="display:none;">
+        <h3>素材库（已禁用的图片不在前台显示，可恢复或彻底删除）</h3>
+        <div class="grid" id="libList"></div>
+        <div style="text-align:center; color:var(--dim); font-size:13px; padding:24px 0;" id="libEmpty">素材库是空的</div>
     </div>
 </div>
 
@@ -408,9 +414,11 @@ function fillCatSel() {
 function renderGrid() {
     var g = document.getElementById('imgGrid');
     g.innerHTML = '';
-    document.getElementById('imgEmpty').style.display = cfg.imgs.length ? 'none' : 'block';
-    document.getElementById('imgEmpty').textContent = cfg.imgs.length ? '' : '还没有图片，点「上传图片」添加';
+    var shown = cfg.imgs.filter(function (it) { return !it.disabled; });
+    document.getElementById('imgEmpty').style.display = shown.length ? 'none' : 'block';
+    document.getElementById('imgEmpty').textContent = shown.length ? '' : '还没有图片，点「上传图片」添加';
     cfg.imgs.forEach(function (it, i) {
+        if (it.disabled) return;
         var d = document.createElement('div');
         d.className = 'tile' + (selSet[i] ? ' sel' : '');
         d.innerHTML = '<img src="https://raw.githubusercontent.com/' + REPO + '/main/' + it.f + '" loading="lazy">' +
@@ -433,7 +441,7 @@ function openMenu(i) {
     h += '<div class="mi" onclick="sheetMove(' + i + ',-1)">上移一位</div>';
     h += '<div class="mi" onclick="sheetMove(' + i + ',1)">下移一位</div>';
     h += '<div class="mi" onclick="sheetPin(' + i + ')">置顶</div>';
-    h += '<div class="mi danger" onclick="sheetDel(' + i + ')">删除</div>';
+    h += '<div class="mi danger" onclick="sheetDisable(' + i + ')">禁用（移到素材库）</div>';
     document.getElementById('menu').innerHTML = h;
     showMenu(true);
 }
@@ -484,14 +492,12 @@ function sheetPin(i) {
     cfg.imgs.unshift(it);
     saveIdx(function () { renderGrid(); });
 }
-function sheetDel(i) {
+function sheetDisable(i) {
     showMenu(false);
     var it = cfg.imgs[i];
-    if (!confirm('删除图片「' + it.t + '」？文件将彻底删除，不可恢复')) return;
-    api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
-        cfg.imgs.splice(i, 1);
-        saveIdx(function () { renderGrid(); });
-    }).catch(function () { msg('删除失败，可稍后重试'); });
+    if (!confirm('把「' + it.t + '」禁用？禁用后前台不显示，图片会放到素材库，需要时可恢复。')) return;
+    it.disabled = true;
+    saveIdx(function () { renderGrid(); });
 }
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 
@@ -536,17 +542,10 @@ document.getElementById('btnMCancel').onclick = function () { selMode = false; s
 document.getElementById('btnMDel').onclick = function () {
     var keys = Object.keys(selSet).filter(function (k) { return selSet[k]; }).map(Number).sort(function (a, b) { return b - a; });
     if (!keys.length) return msg('请先选择图片');
-    if (!confirm('删除所选 ' + keys.length + ' 张图片？')) return;
-    var i = 0;
-    msg('删除中...');
-    (function next() {
-        if (i >= keys.length) { saveIdx(function () { msg('删除完成'); selMode = false; selSet = {}; renderGrid(); }); return; }
-        var k = keys[i];
-        var it = cfg.imgs[k];
-        api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
-            cfg.imgs.splice(k, 1); i++; next();
-        }).catch(function () { cfg.imgs.splice(k, 1); i++; next(); });
-    })();
+    if (!confirm('禁用所选 ' + keys.length + ' 张图片？禁用后前台不显示，可在素材库恢复。')) return;
+    keys.forEach(function (k) { cfg.imgs[k].disabled = true; });
+    selMode = false; selSet = {};
+    saveIdx(function () { msg('已禁用，图片移入素材库'); renderGrid(); });
 };
 document.getElementById('btnMMove').onclick = function () {
     var keys = Object.keys(selSet).filter(function (k) { return selSet[k]; }).map(Number);
@@ -559,6 +558,47 @@ function doMMove(keys) {
     var c = document.getElementById('mm-cat').value;
     keys.forEach(function (k) { cfg.imgs[k].c = c; });
     saveIdx(function () { renderGrid(); closeSheet(); selMode = false; selSet = {}; });
+}
+
+/* ================= 素材库（已禁用图片：恢复 / 彻底删除） ================= */
+document.getElementById('btnLib').onclick = function () {
+    var sec = document.getElementById('libSec');
+    var show = sec.style.display !== 'block';
+    sec.style.display = show ? 'block' : 'none';
+    document.getElementById('btnLib').classList.toggle('on', show);
+    if (show) renderLib();
+};
+function renderLib() {
+    enrichShas().then(function () {
+        var box = document.getElementById('libList');
+        box.innerHTML = '';
+        var lib = [];
+        cfg.imgs.forEach(function (it, i) { if (it.disabled) lib.push({ it: it, i: i }); });
+        document.getElementById('libEmpty').style.display = lib.length ? 'none' : 'block';
+        document.getElementById('libEmpty').textContent = lib.length ? '' : '素材库是空的——图片被「禁用」后会出现在这里';
+        lib.forEach(function (o) {
+            var d = document.createElement('div');
+            d.className = 'tile';
+            d.innerHTML = '<img src="https://raw.githubusercontent.com/' + REPO + '/main/' + o.it.f + '" loading="lazy" style="filter:grayscale(.7);opacity:.75;">' +
+                '<div class="nm">' + o.it.t + '</div><div class="tag">' + catName(o.it.c) + '</div>' +
+                '<div style="display:flex;gap:6px;margin-top:6px;width:100%;">' +
+                '<button class="btn sm primary" style="flex:1;" onclick="restoreImg(' + o.i + ')">恢复</button>' +
+                '<button class="btn sm danger" style="flex:1;" onclick="libDel(' + o.i + ')">彻底删除</button></div>';
+            box.appendChild(d);
+        });
+    });
+}
+function restoreImg(i) {
+    cfg.imgs[i].disabled = false;
+    saveIdx(function () { msg('已恢复，图片回到图库'); renderLib(); renderGrid(); });
+}
+function libDel(i) {
+    var it = cfg.imgs[i];
+    if (!confirm('彻底删除「' + it.t + '」？文件将永久删除，无法恢复。')) return;
+    api('/contents/' + it.f, 'DELETE', { message: 'Del ' + it.f, sha: it._sha }).then(function () {
+        cfg.imgs.splice(i, 1);
+        saveIdx(function () { msg('已彻底删除'); renderLib(); renderGrid(); });
+    }).catch(function () { msg('删除失败，可稍后重试'); });
 }
 
 /* ================= 分类管理 ================= */
