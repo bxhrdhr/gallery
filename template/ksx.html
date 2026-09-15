@@ -143,7 +143,7 @@ var CFG = {
   ],
   "tplRain": true
 };
-var ASSET_BASE = 'https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
+var ASSET_BASE = '../';   /* 本站资源：相对路径（本页在 template/ 下，上一级即仓库根） */
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>/* 站点图标跟随资源基准，本地打开时不再请求外链 */
@@ -160,7 +160,7 @@ if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
 <meta property="og:description" content="一座小小的图库，收藏生活的风景与故事。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="时光图库">
-<meta property="og:image" content="https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg">
+<meta property="og:image" content="https://bxhrdhr.github.io/gallery/img/demo1.jpg">
 <meta property="og:image:width" content="2160">
 <meta property="og:image:height" content="1440">
 <meta property="og:image:alt" content="时光图库封面">
@@ -171,7 +171,7 @@ if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
   "@type": "WebPage",
   "headline": "时光图库",
   "description": "一座小小的图库，收藏生活的风景与故事。",
-  "image": "https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg",
+  "image": "https://bxhrdhr.github.io/gallery/img/demo1.jpg",
   "author": {
     "@type": "Person",
     "name": "时光图库"
@@ -1602,20 +1602,6 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
      开启时后台把下面的容器与脚本标签整段插入本页，关闭时整段移除。
      源码在 js/玻璃雨珠/，其纹理按本页路径相对解析（js/玻璃雨珠/data-img/…），
      所以把整站下载到本地同样能正常显示。 -->
-<!-- 百度自动推送：每次访问自动向百度提交当前 URL -->
-<script>
-(function(){
-    var bp = document.createElement('script');
-    var protocol = window.location.protocol.split(':')[0];
-    if (protocol === 'https') {
-        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-    } else {
-        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-    }
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(bp, s);
-})();
-</script>
 <!-- 背景容器（占位）：引入脚本已提到 <head> 顶部优先加载；万一 js 没加载出来，这层还兜底色 -->
 <div id="glass-rain" aria-hidden="true">
     <canvas id="container"></canvas>
