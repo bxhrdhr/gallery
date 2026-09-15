@@ -11,7 +11,7 @@ var CFG = {
   "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "cream",
+  "bg": "forest",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -84,6 +84,12 @@ var CFG = {
       "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
     },
     {
+      "f": "img/demo3.jpg",
+      "t": "傍晚散步",
+      "c": "life",
+      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a"
+    },
+    {
       "f": "img/1789468891861_567.jpg",
       "t": "深圳一日游",
       "c": "life",
@@ -112,7 +118,36 @@ var CFG = {
       "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
     }
   ],
-  "fx": []
+  "fx": [],
+  "tplBg": "tpl-forest",
+  "tplBgAuto": false,
+  "tplBgAutoSec": 8,
+  "tplBgs": [
+    {
+      "id": "tpl-forest",
+      "name": "墨绿森林",
+      "type": "grad",
+      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
+    },
+    {
+      "id": "tpl-night",
+      "name": "暗夜蓝紫",
+      "type": "grad",
+      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
+    },
+    {
+      "id": "tpl-aurora",
+      "name": "极光青蓝",
+      "type": "grad",
+      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
+    },
+    {
+      "id": "tpl-sakura",
+      "name": "樱花粉白",
+      "type": "grad",
+      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
+    }
+  ]
 };
 var ASSET_BASE = 'https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
@@ -1325,23 +1360,40 @@ const showImage = (index, dir) => {
 renderAllPerfectly();
 renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里 */
 
-    /* ---- 页面背景：读 CFG.bg（后台「背景」页管理，保存时同步） ---- */
+    /* ---- 旧站模板背景：读 CFG.tplBg / CFG.tplBgs（后台「背景」页「旧站模板背景」区块管理，与时光图库背景相互独立） ---- */
     function applyBgTpl() {
         var el = document.getElementById('bgTpl');
         var rain = document.getElementById('glass-rain');
         if (!el) return;
         var b = null;
-        if (CFG.bgs) { for (var i = 0; i < CFG.bgs.length; i++) if (CFG.bgs[i].id === CFG.bg) { b = CFG.bgs[i]; break; } }
-        if (!b) { el.style.background = 'linear-gradient(165deg,#0b0e14,#05070d)'; return; }
+        var bs = CFG.tplBgs || [];
+        for (var i = 0; i < bs.length; i++) if (bs[i].id === CFG.tplBg) { b = bs[i]; break; }
+        if (!b) { el.style.background = 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)'; return; }
         if (b.type === 'img' && b.url) {
             el.style.background = 'url(' + ASSET_BASE + b.url + ') center/cover no-repeat';
             if (rain) rain.style.display = 'none';   /* 图片/动图背景时隐藏雨珠特效，避免遮挡 */
         } else {
-            el.style.background = b.css || 'linear-gradient(165deg,#0b0e14,#05070d)';
+            el.style.background = b.css || 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)';
             if (rain) rain.style.display = '';
         }
     }
+    var tplBgTimer = null, tplBgIdx = 0;
+    function applyBgTplId(id) { CFG.tplBg = id; applyBgTpl(); }
+    function startTplBgAuto() {
+        stopTplBgAuto();
+        var bs = CFG.tplBgs || [];
+        if (!CFG.tplBgAuto || bs.length < 2) return;
+        var start = 0;
+        for (var i = 0; i < bs.length; i++) if (bs[i].id === CFG.tplBg) { start = i; break; }
+        tplBgIdx = start;
+        tplBgTimer = setInterval(function () {
+            tplBgIdx = (tplBgIdx + 1) % bs.length;
+            applyBgTplId(bs[tplBgIdx].id);
+        }, (CFG.tplBgAutoSec || 8) * 1000);
+    }
+    function stopTplBgAuto() { if (tplBgTimer) { clearInterval(tplBgTimer); tplBgTimer = null; } }
     applyBgTpl();
+    startTplBgAuto();
 
     q.onclick=pp;
     b.onclick=()=>{ld(c-1)};
