@@ -4,19 +4,41 @@
 <meta charset="UTF-8">
 <!-- 背景特效：玻璃雨珠（WebGL 雨滴，源码见 js/玻璃雨珠/）—— 放 <head> 顶部，让特效最先开始加载 -->
 <script src="js/玻璃雨珠/玻璃雨珠.js" data-weather="rain" defer></script>
-<script>/* 资源基准（后台「设置 → 资源代理前缀」可改）
-   留空        -> ./   跟着当前目录走（把整站下载到本地时用这个）
-   填 github   -> GitHub 官方仓库直连（大小写皆可）
-   填其它前缀  -> 自定义代理，例如 https://gh-proxy.org/ */
-var ASSET_CFG = 'github';   /* 页面切换模板：内容与旧站 https://woain.cc.cd/ 同步（从 ksx 仓库读取图片/音乐） */
-var ASSET_OFFICIAL = 'https://raw.githubusercontent.com/bxhrdhr/ksx/main/';
-var ASSET_BASE = (function () {
-    var v = String(ASSET_CFG || '').trim();
-    if (!v) return './';
-    if (v.toLowerCase().indexOf('github') !== -1) return ASSET_OFFICIAL;
-    if (v.slice(-1) !== '/') v += '/';
-    return v + ASSET_OFFICIAL;
-})();</script>
+<script>/* 站点配置（与前台 index.html 同一份，后台「保存」会同时同步这里 —— 页面切换模板内容与时光图库同步） */
+var CFG = {
+  "name": "时光图库",
+  "intro": "一座小小的图库，收藏生活的风景与故事。",
+  "pageMode": "gallery",
+  "uiTitle": "TIME GALLERY",
+  "uiSub": "时光图库",
+  "bg": "cream",
+  "bgAuto": false,
+  "bgAutoSec": 8,
+  "bgs": [
+    { "id": "cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)" },
+    { "id": "forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)" },
+    { "id": "night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)" },
+    { "id": "sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)" },
+    { "id": "aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)" }
+  ],
+  "hero": { "eyebrow": "拾光 · 收藏每一帧", "title": "把日子过成画", "sub": "分类收藏 · 慢慢翻阅", "cta": "进入图库" },
+  "cats": [
+    { "id": "all", "name": "全部" },
+    { "id": "life", "name": "生活" },
+    { "id": "view", "name": "风景" },
+    { "id": "food", "name": "美食" }
+  ],
+  "imgs": [
+    { "f": "img/demo1.jpg", "t": "山谷晨光", "c": "view" },
+    { "f": "img/demo2.jpg", "t": "一杯咖啡", "c": "food" },
+    { "f": "img/demo3.jpg", "t": "傍晚散步", "c": "life" }
+  ],
+  "musics": [],
+  "fx": []
+};
+var ASSET_BASE = 'https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
+if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
+if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>/* 站点图标跟随资源基准，本地打开时不再请求外链 */
 (function () {
@@ -32,7 +54,7 @@ var ASSET_BASE = (function () {
 <meta property="og:description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="温故流年">
-<meta property="og:image" content="https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/img/阚双雪_66.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg">
 <meta property="og:image:width" content="2160">
 <meta property="og:image:height" content="1440">
 <meta property="og:image:alt" content="回忆相册封面">
@@ -43,7 +65,7 @@ var ASSET_BASE = (function () {
   "@type": "WebPage",
   "headline": "阚双雪 - 邹洪 - 温故流年 - 自我感动",
   "description": "这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。",
-  "image": "https://gh-proxy.org/https://raw.githubusercontent.com/PeonyJun/ksx/main/img/阚双雪_66.jpg",
+  "image": "https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg",
   "author": {
     "@type": "Person",
     "name": "邹洪"
@@ -642,19 +664,19 @@ body.intro-lock { overflow: hidden; }
   <canvas class="intro-sky" id="introSky" aria-hidden="true"></canvas>
   <div class="intro-shoot" aria-hidden="true"></div>
   <div class="intro-copy">
-    <p class="i-eyebrow">阚双雪致 · 我们曾看过的光</p>
+    <p class="i-eyebrow">拾光 · 收藏每一帧</p>
     <div class="i-title">
-      <p class="i-line">看过的风景</p>
-      <p class="i-line">我都守着</p>
+      <p class="i-line">把日子过成画</p>
+      <p class="i-line">分类收藏 · 慢慢翻阅</p>
     </div>
-    <p class="i-sub">轻轻一点 · 回到那些日子</p>
-    <button class="intro-cta" type="button">进入回忆</button>
+    <p class="i-sub">一座小小的图库，收藏生活的风景与故事。</p>
+    <button class="intro-cta" type="button">进入图库</button>
   </div>
 </div>
 <div class="noise"></div>
 <div class="header">
-    <div class="title">KSX ZH</div>
-    <div class="subtitle">温故流年</div>
+    <div class="title">TIME GALLERY</div>
+    <div class="subtitle">时光图库</div>
 </div>
 <div class="catbar" id="catbar"></div>
 <div id="c"></div>
@@ -687,102 +709,23 @@ body.intro-lock { overflow: hidden; }
 
 <script>
 !function(){
-    const musicFiles = [
-        '你很甜mp3',
-        '尾季篇.mp3',
-        '失去后才明白.mp3',
-        '落日.mp3',
-        '温柔的徘徊.mp3',
-        '星辰大海.mp3',
-        '在你的身边.mp3'
-    ];
-    
-    const rawImageFiles = [
-        'wx_camera_1784882023416jpg',
-        '阚双雪_83.jpg',
-        '阚双雪_85.jpg',
-        '阚双雪_82.jpg',
-        '阚双雪_81.jpg',
-        '阚双雪_80.jpg',
-        '阚双雪_79.jpg',
-        '阚双雪_78.jpg',
-        '阚双雪_77.jpg',
-        '阚双雪_75.jpg',
-        '阚双雪_74.jpg',
-        '阚双雪_73.jpg',
-        '阚双雪_72.jpg',
-        '阚双雪_71.jpg',
-        '阚双雪_70.jpg',
-        '阚双雪_69.jpg',
-        '阚双雪_68.jpg',
-        '阚双雪_67.jpg',
-        '阚双雪_66.jpg',
-        '阚双雪_65.jpg',
-        '阚双雪_64.jpg',
-        '阚双雪_63.jpg',
-        '阚双雪_62.jpg',
-        '阚双雪_61.jpg',
-        '阚双雪_60.jpg',
-        '阚双雪_59.jpg',
-        '阚双雪_58.jpg',
-        '阚双雪_57.jpg',
-        '阚双雪_56.jpg',
-        '阚双雪_55.jpg',
-        '阚双雪_54.jpg',
-        '阚双雪_53.jpg',
-        '阚双雪_52.jpg',
-        '阚双雪_51.jpg',
-        '阚双雪_50.jpg',
-        '阚双雪_49.jpg',
-        '阚双雪_48.jpg',
-        '阚双雪_47.jpg',
-        '阚双雪_46.jpg',
-        '阚双雪_45.jpg',
-        '阚双雪_44.jpg',
-        '阚双雪_43.jpg',
-        '阚双雪_42.jpg',
-        '阚双雪_41.jpg',
-        '阚双雪_40.jpg',
-        '阚双雪_39.jpg',
-        '阚双雪_38.jpg',
-        '阚双雪_37.jpg',
-        '阚双雪_36.jpg',
-        '阚双雪_35.jpg',
-        '阚双雪_34.jpg',
-        '阚双雪_33.jpg',
-        '阚双雪_32.jpg',
-        '阚双雪_31.jpg',
-        '阚双雪_30.jpg',
-        '阚双雪_29.jpg',
-        '阚双雪_28.jpg',
-        '阚双雪_27.jpg',
-        '阚双雪_26.jpg',
-        '阚双雪_25.jpg',
-        '阚双雪_24.jpg',
-        '阚双雪_23.jpg',
-        '阚双雪_22.jpg',
-        '阚双雪_21.jpg',
-        '阚双雪_20.jpg',
-        '阚双雪_19.jpg',
-        '阚双雪_18.jpg',
-        '阚双雪_17.jpg',
-        '阚双雪_16.jpg',
-        '阚双雪_15.jpg',
-        '阚双雪_14.jpg',
-        '阚双雪_13.jpg',
-        '阚双雪_12.jpg',
-        '阚双雪_11.jpg',
-        '阚双雪_10.jpg',
-        '阚双雪_9.jpg',
-        '阚双雪_8.jpg',
-        '阚双雪_7.jpg',
-        '阚双雪_6.jpg',
-        '阚双雪_5.jpg',
-        '阚双雪_4.jpg',
-        '阚双雪_3.jpg',
-        '阚双雪_2.jpg',
-        '阚双雪_1.jpg'
-    ];
+    /* 文案与时光图库同步：标题/开场文字全部读 CFG（后台保存即同步） */
+    document.title = CFG.name + (CFG.uiSub && CFG.uiSub !== CFG.name ? ' · ' + CFG.uiSub : '');
+    var _t = document.querySelector('.title'); if (_t) _t.textContent = CFG.uiTitle || '';
+    var _st = document.querySelector('.subtitle'); if (_st) _st.textContent = CFG.uiSub || CFG.name;
+    var _ey = document.querySelector('.i-eyebrow'); if (_ey) _ey.textContent = CFG.hero.eyebrow;
+    var _l1 = document.querySelector('.i-line:nth-child(1)'); if (_l1) _l1.textContent = CFG.hero.title;
+    var _l2 = document.querySelector('.i-line:nth-child(2)'); if (_l2) _l2.textContent = CFG.hero.sub;
+    var _is = document.querySelector('.i-sub'); if (_is) _is.textContent = CFG.intro;
+    var _ic = document.querySelector('.intro-cta'); if (_ic) _ic.textContent = CFG.hero.cta;
+    var _md = document.querySelector('meta[name="description"]'); if (_md) _md.setAttribute('content', CFG.intro);
+
+    /* 内容与时光图库页面同步：图片/分类/音乐/文字全部来自同一份 CFG（后台保存时同步） */
+    const musicFiles = (CFG.musics || []).map(function (m) { return m.f; });
+    const musicNames = (CFG.musics || []).map(function (m) { return m.name || m.f; });
+
+    const rawImageFiles = (CFG.imgs || []).map(function (it) { return it.f; });
+    const rawImageCats = (CFG.imgs || []).map(function (it) { return it.c || ''; });
 
 
 
@@ -790,26 +733,45 @@ body.intro-lock { overflow: hidden; }
 
     let imageFiles = rawImageFiles.slice();
 
-    /* ---- 自动分类：按文件名自动分组（页面切换模板新增） ---- */
-    let curCat = '全部';
-    function catOf(n) {
+    /* ---- 分类：优先用时光图库后台的分类（内容同步）；无分类时按文件名自动分组 ---- */
+    let curCat = 'all';
+    function hasCfgCats() { return CFG.cats && CFG.cats.length > 1; }
+    function catOf(n, i) {
+        if (hasCfgCats() && rawImageCats[i]) return rawImageCats[i];
         var m = n.match(/^([\u4e00-\u9fa5A-Za-z]{2,})[_\-.\s]/);
         return m ? m[1] : '其他';
+    }
+    function catNameOf(catId) {
+        if (!hasCfgCats()) return catId;
+        for (var i = 0; i < CFG.cats.length; i++) if (CFG.cats[i].id === catId) return CFG.cats[i].name;
+        return catId;
     }
     function renderCatBar() {
         var cb = document.getElementById('catbar');
         if (!cb) return;
-        var cats = ['全部'];
-        rawImageFiles.forEach(function (n) { var c2 = catOf(n); if (cats.indexOf(c2) === -1) cats.push(c2); });
+        var cats;
+        if (hasCfgCats()) {
+            cats = CFG.cats.map(function (c) { return { id: c.id, name: c.name }; });
+        } else {
+            var seen = ['all'];
+            cats = [{ id: 'all', name: '全部' }];
+            rawImageFiles.forEach(function (n, i) {
+                var c2 = catOf(n, i);
+                if (seen.indexOf(c2) === -1) { seen.push(c2); cats.push({ id: c2, name: c2 }); }
+            });
+        }
         cb.innerHTML = '';
         cats.forEach(function (cc) {
             var b = document.createElement('button');
-            b.className = 'catbtn' + (cc === curCat ? ' on' : '');
-            b.textContent = cc;
+            b.className = 'catbtn' + (cc.id === curCat ? ' on' : '');
+            b.textContent = cc.name;
             b.type = 'button';
             b.onclick = function () {
-                curCat = cc;
-                imageFiles = cc === '全部' ? rawImageFiles.slice() : rawImageFiles.filter(function (n) { return catOf(n) === cc; });
+                curCat = cc.id;
+                imageFiles = [];
+                for (var i = 0; i < rawImageFiles.length; i++) {
+                    if (curCat === 'all' || catOf(rawImageFiles[i], i) === curCat) imageFiles.push(rawImageFiles[i]);
+                }
                 var container = document.getElementById('c');
                 container.innerHTML = '';
                 renderAllPerfectly();
@@ -1004,9 +966,9 @@ body.intro-lock { overflow: hidden; }
     };
 
     if(musicFiles.length) {
-        t = musicFiles.map(f => ({
-            u: `${ASSET_BASE}mp3/${f}`,
-            n: f.replace(/\.mp3$/i, '').replace(/[^\u4e00-\u9fa5]/g,'') || f.replace(/\.mp3$/i, '')
+        t = musicFiles.map((f, mi) => ({
+            u: ASSET_BASE + f,
+            n: musicNames[mi] || f.replace(/\.mp3$/i, '').replace(/[^\u4e00-\u9fa5]/g,'') || f.replace(/\.mp3$/i, '')
         }));
         
         t.forEach((s,i)=>{
@@ -1094,7 +1056,7 @@ body.intro-lock { overflow: hidden; }
         step();
     };
     const preloadOriginal = (fileName) => {
-        const src = `${ASSET_BASE}img/${fileName}`;
+        const src = ASSET_BASE + fileName;
         if (origDone.has(src)) return;
         origDone.add(src);
         origQueue.push(src);
@@ -1105,7 +1067,7 @@ body.intro-lock { overflow: hidden; }
 const preloadImage = (idx) => {
     if (!imageFiles.length) return;
     let i = (idx + imageFiles.length) % imageFiles.length;
-    const src = `${ASSET_BASE}img/${imageFiles[i]}`;
+    const src = ASSET_BASE + imageFiles[i];
     if (pCache.has(src)) return;
     const img = new Image();
     img.src = src;
@@ -1116,7 +1078,7 @@ const showImage = (index, dir) => {
     index = (index + imageFiles.length) % imageFiles.length;
     currentImgIndex = index;
     const f = imageFiles[index];
-    const imgSrc = `${ASSET_BASE}img/${f}`;
+    const imgSrc = ASSET_BASE + f;
     // 防残留/竞态：自增 token，只有最新一次加载完成才真正显示，避免短暂显示上一张/错图
     const token = ++imgToken;
     vImg.style.opacity = '0';
@@ -1209,8 +1171,7 @@ const showImage = (index, dir) => {
 
         w.loadImg = () => {
             w.classList.remove('error', 'loaded');
-            var dir = w.dataset.fb ? 'img/' : 'img/thumbs/';
-            img.src = `${ASSET_BASE}${dir}${fileName}${w.dataset.retry ? '?t=' + Date.now() : ''}`;
+            img.src = ASSET_BASE + fileName + (w.dataset.retry ? '?t=' + Date.now() : '');
             w.dataset.retry = 'true';
             
             img.decode().then(() => {
@@ -1222,14 +1183,9 @@ const showImage = (index, dir) => {
         };
 
         img.onerror = () => {
-            if (!w.dataset.fb) {
-                w.dataset.fb = '1';
-                w.loadImg();
-            } else {
-                w.classList.remove('loaded');
-                w.classList.add('error');
-                img.removeAttribute('src');
-            }
+            w.classList.remove('loaded');
+            w.classList.add('error');
+            img.removeAttribute('src');
         };
 
         w.onclick = (e) => {
