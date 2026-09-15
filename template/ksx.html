@@ -8,10 +8,10 @@
 var CFG = {
   "name": "时光图库",
   "intro": "一座小小的图库，收藏生活的风景与故事。",
-  "pageMode": "gallery",
+  "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "cream",
+  "bg": "forest",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -87,8 +87,7 @@ var CFG = {
       "f": "img/demo3.jpg",
       "t": "傍晚散步",
       "c": "life",
-      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a",
-      "disabled": true
+      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a"
     },
     {
       "f": "img/1789468891861_567.jpg",
@@ -119,11 +118,8 @@ var CFG = {
       "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
     }
   ],
-  "fx": [
-    "js/全屏/樱花特效.js",
-    "js/全屏/飞雪特效.js"
-  ],
-  "tplBg": "tpl-sakura",
+  "fx": [],
+  "tplBg": "tpl-forest",
   "tplBgAuto": false,
   "tplBgAutoSec": 8,
   "tplBgs": [
@@ -846,8 +842,9 @@ body.intro-lock { overflow: hidden; }
     var _md = document.querySelector('meta[name="description"]'); if (_md) _md.setAttribute('content', CFG.intro);
 
     /* 内容与时光图库页面同步：图片/分类/音乐/文字全部来自同一份 CFG（后台保存时同步） */
-    const musicFiles = (CFG.musics || []).map(function (m) { return m.f; });
-    const musicNames = (CFG.musics || []).map(function (m) { return m.name || m.f; });
+    /* 已禁用的音乐（后台「音乐素材库」）不播放 */
+    const musicFiles = (CFG.musics || []).filter(function (m) { return !m.disabled; }).map(function (m) { return m.f; });
+    const musicNames = (CFG.musics || []).filter(function (m) { return !m.disabled; }).map(function (m) { return m.name || m.f; });
 
     /* 已禁用的图片（后台「素材库」）不在旧站风格页展示 */
     const rawImageFiles = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.f; });
