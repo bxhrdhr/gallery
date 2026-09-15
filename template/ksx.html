@@ -1172,13 +1172,11 @@ const showImage = (index, dir) => {
             w.classList.remove('error', 'loaded');
             img.src = ASSET_BASE + fileName + (w.dataset.retry ? '?t=' + Date.now() : '');
             w.dataset.retry = 'true';
-            
-            img.decode().then(() => {
-                w.classList.add('loaded');
-                preloadOriginal(fileName);
-            }).catch(() => {
-                if(img.complete) { w.classList.add('loaded'); preloadOriginal(fileName); }
-            });
+        };
+
+        img.onload = () => {
+            w.classList.add('loaded');
+            preloadOriginal(fileName);
         };
 
         img.onerror = () => {
