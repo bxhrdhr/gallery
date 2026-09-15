@@ -770,6 +770,8 @@ body.intro-lock { overflow: hidden; }
 #glass-rain #container{position:absolute;top:0;left:0;display:block}
 /* 页面背景（后台「背景」页管理：渐变/图片/动图） */
 #bgTpl{position:fixed;inset:0;z-index:-2;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat;transition:background .5s ease}
+/* 玻璃雨珠容器强制透明：只留雨滴，页面背景（#bgTpl）永远不被盖住 */
+#glass-rain,#glass-rain-canvas{background:transparent!important}
 </style>
 <!-- ===== 开场：星夜回忆 ===== -->
 <div id="intro" class="intro">
@@ -1528,7 +1530,7 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
     try {
         if (typeof CFG !== 'undefined' && CFG.tplRain === false) return;
         var s = document.createElement('script');
-        s.src = './js/玻璃雨珠/玻璃雨珠.js?v=4';
+        s.src = './js/玻璃雨珠/玻璃雨珠.js?v=5';
         s.setAttribute('data-weather', 'rain');
         s.async = false;
         document.head.appendChild(s);
