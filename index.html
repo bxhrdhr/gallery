@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="index, follow">
+<title>时光图库 · 珍藏每一刻</title>
+<meta name="description" content="一座小小的图库，收藏生活的风景与故事。">
+<script>
+/* ==================== 站点配置（后台「设置」会改写这里） ==================== */
+var CFG = {
+    name: '时光图库',
+    intro: '一座小小的图库，收藏生活的风景与故事。',
+    uiTitle: 'TIME GALLERY',
+    uiSub: '时光图库',
+    bg: 'cream',
+    hero: {
+        eyebrow: '拾光 · 收藏每一帧',
+        title: '把日子过成画',
+        sub: '分类收藏 · 慢慢翻阅'
+    },
+    cta: '进入图库',
+    cats: [
+        {id: 'all', name: '全部'},
+        {id: 'life', name: '生活'},
+        {id: 'view', name: '风景'},
+        {id: 'food', name: '美食'}
+    ],
+    imgs: [
+        {f: 'img/demo1.jpg', t: '山谷晨光', c: 'view'},
+        {f: 'img/demo2.jpg', t: '一杯咖啡', c: 'food'},
+        {f: 'img/demo3.jpg', t: '傍晚散步', c: 'life'}
+    ],
+    musics: [],
+    fx: []
+};
+var ASSET_BASE = '';
+if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
+</script>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+html, body { margin: 0; padding: 0; }
+body {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+    color: var(--ink);
+    background: var(--bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.6s ease;
+}
+/* ===== 背景方案（后台「背景」可切换，写在 body 的 data-bg 上） ===== */
+[data-bg="cream"]   { --bg: linear-gradient(165deg,#fdf8f0 0%,#f5ead9 55%,#efe0c8 100%); --ink:#3d3a35; --soft:#8a8377; --card:#ffffff; --line:rgba(120,100,70,.16); --accent:#e07a5f; --accent2:#d4a373; --glass:rgba(255,252,246,.72); }
+[data-bg="forest"]  { --bg: linear-gradient(165deg,#24402e 0%,#14271b 60%,#0c1a11 100%); --ink:#eef3e9; --soft:#a8b8a6; --card:#1d3023; --line:rgba(220,240,210,.14); --accent:#9cc77a; --accent2:#d9b36a; --glass:rgba(20,36,24,.72); }
+[data-bg="night"]   { --bg: linear-gradient(165deg,#232a4d 0%,#141731 60%,#0b0d1d 100%); --ink:#eceefb; --soft:#9ba3cf; --card:#1c2140; --line:rgba(180,190,255,.14); --accent:#8b9cf0; --accent2:#c9a2e8; --glass:rgba(18,20,40,.72); }
+[data-bg="sakura"]  { --bg: linear-gradient(165deg,#fff7f6 0%,#fde8e6 55%,#fbdcd6 100%); --ink:#4a3f42; --soft:#a0888c; --card:#ffffff; --line:rgba(190,120,130,.16); --accent:#e88aa0; --accent2:#f0b7a6; --glass:rgba(255,250,248,.72); }
+[data-bg="aurora"]  { --bg: linear-gradient(165deg,#0d3f46 0%,#0a2a33 55%,#071c24 100%); --ink:#e6f4f2; --soft:#8fb6b6; --card:#0f2f36; --line:rgba(140,220,210,.14); --accent:#5fc8bd; --accent2:#7fb8e8; --glass:rgba(9,32,38,.72); }
+
+/* ===== 顶部导航 ===== */
+.topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px;
+    background: var(--glass);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; flex-direction: column; line-height: 1.1; }
+.brand b { font-size: 15px; letter-spacing: .12em; color: var(--ink); }
+.brand span { font-size: 10px; letter-spacing: .3em; color: var(--soft); margin-top: 2px; }
+.cat-nav { display: flex; gap: 4px; overflow-x: auto; max-width: 60vw; scrollbar-width: none; }
+.cat-nav::-webkit-scrollbar { display: none; }
+.cat-nav button {
+    border: 1px solid transparent; background: transparent; color: var(--soft);
+    font-family: inherit; font-size: 13px; letter-spacing: .1em;
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+    transition: all .25s ease;
+}
+.cat-nav button.on { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* ===== Hero 主视觉 ===== */
+.hero {
+    padding: 118px 22px 40px; text-align: center;
+    position: relative;
+}
+.hero .eyebrow {
+    display: inline-block; font-size: 12px; letter-spacing: .42em; text-indent: .42em;
+    color: var(--accent); margin-bottom: 18px;
+    border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent);
+    padding: 7px 14px; opacity: 0; animation: rise .9s ease .1s forwards;
+}
+.hero h1 {
+    margin: 0 0 16px; font-size: clamp(34px, 8vw, 58px); font-weight: 600;
+    letter-spacing: .06em; color: var(--ink); line-height: 1.18;
+    opacity: 0; animation: rise .9s ease .3s forwards;
+}
+.hero p {
+    margin: 0; font-size: 14px; letter-spacing: .3em; text-indent: .3em; color: var(--soft);
+    opacity: 0; animation: rise .9s ease .5s forwards;
+}
+.hero .cta {
+    display: inline-block; margin-top: 30px; padding: 13px 46px; border-radius: 999px;
+    font-family: inherit; font-size: 15px; letter-spacing: .3em; text-indent: .3em;
+    color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; cursor: pointer; box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    opacity: 0; animation: rise .9s ease .7s forwards;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.hero .cta:active { transform: scale(.96); }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== 分类条（移动端跟随筛选） ===== */
+.cat-strip { display: none; }
+@media (max-width: 760px) {
+    .cat-nav { display: none; }
+    .cat-strip { display: flex; gap: 6px; overflow-x: auto; padding: 0 18px 6px; scrollbar-width: none; margin-top: 74px; }
+    .cat-strip::-webkit-scrollbar { display: none; }
+    .cat-strip button {
+        border: 1px solid var(--line); background: var(--card); color: var(--soft);
+        font-family: inherit; font-size: 13px; letter-spacing: .08em;
+        padding: 7px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+    }
+    .cat-strip button.on { color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; }
+}
+
+/* ===== 图片网格 ===== */
+.gallery { max-width: 1180px; margin: 0 auto; padding: 10px 18px 90px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+.card {
+    position: relative; border-radius: 18px; overflow: hidden; cursor: pointer;
+    background: var(--card); border: 1px solid var(--line);
+    box-shadow: 0 6px 22px rgba(0,0,0,.07);
+    transition: transform .3s ease, box-shadow .3s ease;
+    opacity: 0; transform: translateY(16px);
+}
+.card.show { opacity: 1; transform: translateY(0); }
+.card:active { transform: scale(.98); }
+.card img { width: 100%; height: 300px; object-fit: cover; display: block; transition: transform .5s ease; }
+.card:hover img { transform: scale(1.05); }
+.card .cap {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 34px 14px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+    color: #fff; font-size: 13px; letter-spacing: .12em; text-align: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card .cat-tag {
+    position: absolute; top: 10px; left: 10px; font-size: 10px; letter-spacing: .14em;
+    padding: 4px 10px; border-radius: 999px; color: var(--accent);
+    background: rgba(255,255,255,.82); backdrop-filter: blur(6px);
+}
+.empty {
+    text-align: center; padding: 70px 0; color: var(--soft); letter-spacing: .2em; font-size: 13px;
+}
+
+/* ===== 灯箱 ===== */
+.lightbox {
+    position: fixed; inset: 0; z-index: 200; display: none;
+    background: rgba(6,8,14,.92); backdrop-filter: blur(8px);
+    flex-direction: column; align-items: center; justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 74vh; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.6); animation: zoom .3s ease; }
+@keyframes zoom { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.lightbox .lb-cap { margin-top: 16px; color: #e9e4d8; font-size: 15px; letter-spacing: .18em; }
+.lightbox .lb-close {
+    position: absolute; top: 22px; right: 22px; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff;
+    font-size: 16px; cursor: pointer;
+}
+.lightbox .lb-arr {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.06); color: #fff; font-size: 18px; cursor: pointer;
+}
+.lightbox .lb-arr.prev { left: 16px; }
+.lightbox .lb-arr.next { right: 16px; }
+
+/* ===== 悬浮二次元播放器 ===== */
+.fp {
+    position: fixed; right: 18px; bottom: 26px; z-index: 120;
+}
+.fp-btn {
+    width: 62px; height: 62px; border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #ff9db6, #ffc9a8);
+    color: #fff; box-shadow: 0 8px 24px rgba(255,120,150,.45);
+    display: flex; align-items: center; justify-content: center;
+    animation: fpFloat 3.2s ease-in-out infinite;
+}
+.fp-btn svg { width: 26px; height: 26px; }
+@keyframes fpFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.fp-panel {
+    position: absolute; right: 0; bottom: 74px; width: 300px; max-height: 420px;
+    background: linear-gradient(165deg, #fff6f8, #ffeef2);
+    border-radius: 24px; box-shadow: 0 18px 50px rgba(120,60,80,.28);
+    border: 1px solid rgba(255,180,200,.5);
+    padding: 18px 16px 14px; display: none; flex-direction: column;
+    transform-origin: bottom right; animation: fpPop .28s ease;
+}
+.fp-panel.open { display: flex; }
+@keyframes fpPop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.fp-panel .fp-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 13px; letter-spacing: .18em; color: #b35c76; font-weight: 600;
+}
+.fp-panel .fp-head svg { width: 18px; height: 18px; }
+.fp-song {
+    text-align: center; font-size: 14px; letter-spacing: .06em; color: #5a4048;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px; min-height: 20px;
+}
+.fp-bar { height: 5px; background: rgba(255,160,180,.35); border-radius: 3px; position: relative; cursor: pointer; }
+.fp-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg,#ff8fa8,#ffb78a); border-radius: 3px; }
+.fp-ctrl { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 12px 0 10px; }
+.fp-ctrl button { border: none; background: transparent; color: #b35c76; cursor: pointer; padding: 4px; }
+.fp-ctrl button svg { width: 22px; height: 22px; }
+.fp-ctrl .pp {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg,#ff9db6,#ffc9a8); color: #fff;
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(255,120,150,.4);
+}
+.fp-ctrl .pp svg { width: 24px; height: 24px; }
+.fp-list { overflow-y: auto; max-height: 150px; scrollbar-width: thin; }
+.fp-list .fp-item {
+    padding: 8px 10px; border-radius: 10px; font-size: 13px; color: #6d515a;
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fp-list .fp-item.on { background: rgba(255,160,180,.22); color: #b34662; }
+.fp-empty { text-align: center; font-size: 12px; color: #c49aa5; padding: 12px 0 4px; letter-spacing: .14em; }
+
+/* ===== 页脚 ===== */
+.footer {
+    text-align: center; padding: 26px 20px 120px; font-size: 11px;
+    letter-spacing: .22em; color: var(--soft);
+}
+</style>
+</head>
+<body data-bg="cream">
+<header class="topbar">
+    <div class="brand"><b>时光图库</b><span>TIME GALLERY</span></div>
+    <div class="cat-nav" id="catNav"></div>
+</header>
+
+<div class="hero" id="hero">
+    <span class="eyebrow" id="hEyebrow"></span>
+    <h1 id="hTitle"></h1>
+    <p id="hSub"></p>
+    <button class="cta" id="hCta" type="button"></button>
+</div>
+
+<div class="cat-strip" id="catStrip"></div>
+
+<main class="gallery">
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none;"></div>
+</main>
+
+<footer class="footer" id="footer"></footer>
+
+<!-- 灯箱 -->
+<div class="lightbox" id="lb">
+    <button class="lb-close" id="lbClose" type="button">×</button>
+    <button class="lb-arr prev" id="lbPrev" type="button">‹</button>
+    <img id="lbImg" alt="">
+    <button class="lb-arr next" id="lbNext" type="button">›</button>
+    <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<!-- 悬浮二次元播放器 -->
+<div class="fp">
+    <div class="fp-panel" id="fpPanel">
+        <div class="fp-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <span>音乐小站</span>
+        </div>
+        <div class="fp-song" id="fpSong">未在播放</div>
+        <div class="fp-bar" id="fpBar"><i id="fpBarI"></i></div>
+        <div class="fp-ctrl">
+            <button id="fpPrev" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14l-10-7z"/></svg></button>
+            <button class="pp" id="fpPlay" type="button"><svg id="fpPlayI" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg></button>
+            <button id="fpNext" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+        </div>
+        <div class="fp-list" id="fpList"></div>
+    </div>
+    <button class="fp-btn" id="fpBtn" type="button" aria-label="播放器">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </button>
+</div>
+
+<!-- 特效注入容器 -->
+<div id="fxMount"></div>
+
+<script>
+(function () {
+    var C = CFG;
+    document.body.setAttribute('data-bg', C.bg || 'cream');
+    document.title = C.name + ' · ' + C.uiSub;
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.content = C.intro;
+
+    /* ---- 品牌 ---- */
+    document.querySelector('.brand b').textContent = C.uiSub;
+    document.querySelector('.brand span').textContent = C.uiTitle;
+    document.querySelector('#footer').textContent = C.name + ' · 每一帧都值得收藏';
+
+    /* ---- Hero ---- */
+    document.getElementById('hEyebrow').textContent = C.hero.eyebrow;
+    document.getElementById('hTitle').textContent = C.hero.title;
+    document.getElementById('hSub').textContent = C.hero.sub;
+    document.getElementById('hCta').textContent = C.cta;
+
+    /* ---- 分类 ---- */
+    var curCat = 'all';
+    function renderCats() {
+        var nav = document.getElementById('catNav');
+        var strip = document.getElementById('catStrip');
+        nav.innerHTML = ''; strip.innerHTML = '';
+        C.cats.forEach(function (c) {
+            var b1 = document.createElement('button');
+            b1.textContent = c.name;
+            b1.className = c.id === curCat ? 'on' : '';
+            b1.onclick = function () { curCat = c.id; renderCats(); renderGrid(); };
+            nav.appendChild(b1);
+            var b2 = b1.cloneNode(true);
+            b2.onclick = function () { curCat = c.id; renderCats(); renderGrid(); };
+            strip.appendChild(b2);
+        });
+    }
+
+    /* ---- 图片网格 ---- */
+    function catName(id) {
+        for (var i = 0; i < C.cats.length; i++) if (C.cats[i].id === id) return C.cats[i].name;
+        return '';
+    }
+    var list = [];
+    function renderGrid() {
+        var grid = document.getElementById('grid');
+        var empty = document.getElementById('empty');
+        grid.innerHTML = '';
+        list = [];
+        C.imgs.forEach(function (it) {
+            if (curCat !== 'all' && it.c !== curCat) return;
+            list.push(it);
+        });
+        if (!list.length) {
+            empty.style.display = 'block';
+            empty.textContent = '这个分类还没有图片';
+            return;
+        }
+        empty.style.display = 'none';
+        list.forEach(function (it, idx) {
+            var card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = (idx * 0.05) + 's';
+            card.innerHTML =
+                '<img loading="lazy" src="' + ASSET_BASE + it.f + '" alt="' + it.t + '">' +
+                '<div class="cap">' + it.t + '</div>' +
+                '<div class="cat-tag">' + catName(it.c) + '</div>';
+            card.onclick = function () { openLb(idx); };
+            grid.appendChild(card);
+            requestAnimationFrame(function () { card.classList.add('show'); });
+        });
+    }
+
+    /* ---- 灯箱 ---- */
+    var lb = document.getElementById('lb');
+    var lbImg = document.getElementById('lbImg');
+    var lbCap = document.getElementById('lbCap');
+    var lbIdx = 0;
+    function openLb(i) {
+        lbIdx = i;
+        lbImg.src = ASSET_BASE + list[i].f;
+        lbCap.textContent = list[i].t;
+        lb.classList.add('open');
+    }
+    function closeLb() { lb.classList.remove('open'); }
+    function stepLb(d) {
+        lbIdx = (lbIdx + d + list.length) % list.length;
+        lbImg.src = ASSET_BASE + list[lbIdx].f;
+        lbCap.textContent = list[lbIdx].t;
+    }
+    document.getElementById('lbClose').onclick = closeLb;
+    document.getElementById('lbPrev').onclick = function () { stepLb(-1); };
+    document.getElementById('lbNext').onclick = function () { stepLb(1); };
+    lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+
+    /* ---- Hero 进入按钮 ---- */
+    document.getElementById('hCta').onclick = function () {
+        document.querySelector('.gallery').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    /* ---- 悬浮二次元播放器 ---- */
+    var audio = document.createElement('audio');
+    audio.preload = 'auto';
+    document.body.appendChild(audio);
+    var playing = false;
+    var cur = -1;
+
+    function renderList() {
+        var box = document.getElementById('fpList');
+        box.innerHTML = '';
+        if (!C.musics.length) {
+            box.innerHTML = '<div class="fp-empty">暂无音乐，请到后台添加</div>';
+            return;
+        }
+        C.musics.forEach(function (m, i) {
+            var d = document.createElement('div');
+            d.className = 'fp-item' + (i === cur ? ' on' : '');
+            d.textContent = m.name;
+            d.onclick = function () { playAt(i); };
+            box.appendChild(d);
+        });
+    }
+    function playAt(i) {
+        cur = i;
+        audio.src = ASSET_BASE + C.musics[i].f;
+        audio.play().then(function () { playing = true; paint(); }).catch(function () {});
+        paint();
+    }
+    function toggle() {
+        if (!C.musics.length) return;
+        if (cur < 0) { playAt(0); return; }
+        if (playing) { audio.pause(); playing = false; }
+        else { audio.play().catch(function () {}); playing = true; }
+        paint();
+    }
+    function paint() {
+        var name = cur >= 0 ? C.musics[cur].name : '未在播放';
+        document.getElementById('fpSong').textContent = name;
+        document.getElementById('fpPlayI').setAttribute('d', playing ? 'M7 5h4v14H7zM13 5h4v14h-4z' : 'M8 5l11 7-11 7z');
+        var items = document.querySelectorAll('.fp-item');
+        for (var i = 0; i < items.length; i++) items[i].className = 'fp-item' + (i === cur ? ' on' : '');
+    }
+    audio.addEventListener('timeupdate', function () {
+        if (audio.duration) document.getElementById('fpBarI').style.width = (audio.currentTime / audio.duration * 100) + '%';
+    });
+    audio.addEventListener('ended', function () {
+        if (C.musics.length) playAt((cur + 1) % C.musics.length);
+    });
+    document.getElementById('fpBtn').onclick = function () {
+        document.getElementById('fpPanel').classList.toggle('open');
+    };
+    document.getElementById('fpPlay').onclick = toggle;
+    document.getElementById('fpPrev').onclick = function () { if (C.musics.length) playAt((cur - 1 + C.musics.length) % C.musics.length); };
+    document.getElementById('fpNext').onclick = function () { if (C.musics.length) playAt((cur + 1) % C.musics.length); };
+    document.getElementById('fpBar').onclick = function (e) {
+        if (!audio.duration) return;
+        var r = e.currentTarget.getBoundingClientRect();
+        audio.currentTime = (e.clientX - r.left) / r.width * audio.duration;
+    };
+
+    /* ---- 启动 ---- */
+    renderCats();
+    renderGrid();
+    renderList();
+    paint();
+
+    /* ---- 特效注入 ---- */
+    C.fx.forEach(function (src) {
+        var s = document.createElement('script');
+        s.src = ASSET_BASE + src;
+        s.defer = true;
+        document.getElementById('fxMount').appendChild(s);
+    });
+})();
+</script>
+</body>
+</html>
