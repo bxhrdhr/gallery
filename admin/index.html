@@ -623,7 +623,7 @@ document.getElementById('btnSave404').onclick = function () {
 function renderPlg() {
     var box = document.getElementById('plgList');
     box.innerHTML = '<div style="color:var(--dim);font-size:12px;">读取中...</div>';
-    var dirs = ['', '全屏', '图片', '文字', '点击'];
+    var dirs = ['', '全屏', '图片', '文字', '点击', '玻璃雨珠'];
     var jobs = dirs.map(function (sub) {
         var p = sub ? '/contents/js/' + encodeURIComponent(sub) : '/contents/js';
         return api(p).then(function (list) {
