@@ -66,12 +66,11 @@
 
     // 默认纹理源只写纯 ASCII：外部 js 未声明 charset 时浏览器可能按 Windows-1252
     // 解码，源码里的中文路径会变乱码 → 纹理全部 404。
-    var CDN_BASE = 'https://www.zhksx.xyz/js/%E7%8E%BB%E7%92%83%E9%9B%A8%E7%8F%A0/';
+    var CDN_BASE = '';   // 已移除原站外链：纹理一律只从本站目录加载
 
     // 脚本所在目录：js 与 data-img/ 放一起即可零配置（file:// 也能用）
     var SELF_DIR = SELF ? String(SELF.src).replace(/[?#].*$/, '').replace(/[^/]*$/, '') : '';
-    var BASE = CFG.base ||
-        ((SELF_DIR && SELF_DIR.indexOf('zhksx.xyz') < 0) ? SELF_DIR : CDN_BASE);
+    var BASE = CFG.base || SELF_DIR || '';
     if (BASE.slice(-1) !== '/') BASE += '/';
 
     // 纹理不一定在 js 同目录：很多站点把 js 丢进 data-js/ 之类的子目录，纹理却和页面同级。
@@ -82,7 +81,7 @@
         } catch (e) { return ''; }
     })();
     var __GR_IMG_BASE__ = BASE;
-    var __GR_ALT_BASE__ = (BASE === CDN_BASE) ? '' : CDN_BASE;
+    var __GR_ALT_BASE__ = '';   // 不再备原站 CDN：纹理只从本站目录加载
     // 依次尝试的纹理根目录：js 目录 → 页面目录 → CDN
     var __GR_BASES__ = (function () {
         var a = [__GR_IMG_BASE__];
@@ -91,7 +90,7 @@
         return a;
     })();
     var __GR_IMG_BASE__ = BASE;
-    var __GR_ALT_BASE__ = (BASE === CDN_BASE) ? '' : CDN_BASE;
+    var __GR_ALT_BASE__ = '';   // 不再备原站 CDN：纹理只从本站目录加载
     var __GR_CANVAS__ = '#' + CANVAS_ID;
     var __GR_SEL__ = '#' + ROOT_ID + ' ';
     // 渲染分辨率：dprCap 是上限，再按「总像素上限」压一道 —— 4K / 视网膜屏配 dprCap=1.5
