@@ -262,7 +262,7 @@ var CFG = {
   "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "cream",
+  "bg": "forest",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -323,16 +323,16 @@ var CFG = {
   ],
   "imgs": [
     {
-      "f": "img/demo2.jpg",
-      "t": "一杯咖啡",
-      "c": "food",
-      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
-    },
-    {
       "f": "img/demo1.jpg",
       "t": "山谷晨光",
       "c": "view",
       "_sha": "8cc8990b18e1fc4c7fbedbf6c88bb6f2e1dea549"
+    },
+    {
+      "f": "img/demo2.jpg",
+      "t": "一杯咖啡",
+      "c": "food",
+      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
     },
     {
       "f": "img/demo3.jpg",
@@ -369,13 +369,8 @@ var CFG = {
       "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
     }
   ],
-  "fx": [
-    "js/全屏/樱花特效.js",
-    "js/全屏/飞雪特效.js",
-    "js/图片/图片呼吸特效.js",
-    "js/点击/水波纹点击特效.js"
-  ],
-  "tplBg": "tpl-sakura",
+  "fx": [],
+  "tplBg": "tpl-forest",
   "tplBgAuto": false,
   "tplBgAutoSec": 8,
   "tplBgs": [
@@ -483,8 +478,9 @@ function renderCats() {
 
 /* ---------- 相册（大图 + 小图） ---------- */
 function curList() {
-    if (curCat === 'all') return C.imgs.slice();
-    return C.imgs.filter(function (it) { return it.c === curCat; });
+    /* 已禁用的图片（后台「素材库」）不展示 */
+    if (curCat === 'all') return C.imgs.filter(function (it) { return !it.disabled; });
+    return C.imgs.filter(function (it) { return !it.disabled && it.c === curCat; });
 }
 function catName(id) {
     for (var i = 0; i < C.cats.length; i++) if (C.cats[i].id === id) return C.cats[i].name;
