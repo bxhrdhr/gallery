@@ -18,7 +18,7 @@
         base:       '',          // 纹理目录；留空 = 用同级的 data-img/
         zIndex:     -1,          // 层级：-1 垫在内容之后；html+body 都有底色时自动让位
         opacity:    1,           // 整体透明度，0~1
-        background: '#05070d',   // 雨景底色，纹理没就绪时也不白屏
+        background: 'transparent',   // 容器完全透明：只画雨滴，露出下方页面背景（不再盖住 tplBg）
         dprCap:     1.5,         // 清晰度上限，越大越清晰越费电
         cache:      true,        // 纹理缓存：首次下载后存本地，下次直接读；false 关闭
         enabled:    true         // false = 临时关掉
