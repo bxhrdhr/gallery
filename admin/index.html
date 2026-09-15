@@ -432,7 +432,7 @@ function renderGrid() {
         if (it.disabled) return;
         var d = document.createElement('div');
         d.className = 'tile' + (selSet[i] ? ' sel' : '');
-        d.innerHTML = '<img src="https://raw.githubusercontent.com/' + REPO + '/main/' + it.f + '" loading="lazy">' +
+        d.innerHTML = '<img src="../' + it.f + '" loading="lazy">' +
             '<div class="nm">' + it.t + '</div><div class="tag">' + catName(it.c) + '</div>' +
             '<div class="sel"></div>';
         d.onclick = function () {
@@ -590,7 +590,7 @@ function renderLib() {
         lib.forEach(function (o) {
             var d = document.createElement('div');
             d.className = 'tile';
-            d.innerHTML = '<img src="https://raw.githubusercontent.com/' + REPO + '/main/' + o.it.f + '" loading="lazy" style="filter:grayscale(.7);opacity:.75;">' +
+            d.innerHTML = '<img src="../' + o.it.f + '" loading="lazy" style="filter:grayscale(.7);opacity:.75;">' +
                 '<div class="nm">' + o.it.t + '</div><div class="tag">' + catName(o.it.c) + '</div>' +
                 '<div style="display:flex;gap:6px;margin-top:6px;width:100%;">' +
                 '<button class="btn sm primary" style="flex:1;" onclick="restoreImg(' + o.i + ')">恢复</button>' +
@@ -763,7 +763,7 @@ function ensureBgs() {
     if (!cfg.bgs || !cfg.bgs.length) cfg.bgs = DEFAULT_BGS.map(function (b) { return JSON.parse(JSON.stringify(b)); });
 }
 function bgPreview(b) {
-    if (b.type === 'img') return 'url(https://raw.githubusercontent.com/' + REPO + '/main/' + b.url + ') center/cover';
+    if (b.type === 'img') return 'url(../' + b.url + ') center/cover';
     return b.css;
 }
 function renderBgs() {
