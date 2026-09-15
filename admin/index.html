@@ -625,7 +625,7 @@ function renderPlg() {
     box.innerHTML = '<div style="color:var(--dim);font-size:12px;">读取中...</div>';
     var dirs = ['', '全屏', '图片', '文字', '点击'];
     var jobs = dirs.map(function (sub) {
-        var p = sub ? '/js/' + encodeURIComponent(sub) : '/js';
+        var p = sub ? '/contents/js/' + encodeURIComponent(sub) : '/contents/js';
         return api(p).then(function (list) {
             return (list || []).filter(function (it) { return it.type === 'file' && /\.js$/.test(it.name); })
                 .map(function (it) {
