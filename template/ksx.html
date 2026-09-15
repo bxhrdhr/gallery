@@ -11,7 +11,7 @@ var CFG = {
   "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "cream",
+  "bg": "forest",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -72,16 +72,16 @@ var CFG = {
   ],
   "imgs": [
     {
-      "f": "img/demo2.jpg",
-      "t": "一杯咖啡",
-      "c": "food",
-      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
-    },
-    {
       "f": "img/demo1.jpg",
       "t": "山谷晨光",
       "c": "view",
       "_sha": "8cc8990b18e1fc4c7fbedbf6c88bb6f2e1dea549"
+    },
+    {
+      "f": "img/demo2.jpg",
+      "t": "一杯咖啡",
+      "c": "food",
+      "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
     },
     {
       "f": "img/demo3.jpg",
@@ -118,13 +118,8 @@ var CFG = {
       "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
     }
   ],
-  "fx": [
-    "js/全屏/樱花特效.js",
-    "js/全屏/飞雪特效.js",
-    "js/图片/图片呼吸特效.js",
-    "js/点击/水波纹点击特效.js"
-  ],
-  "tplBg": "tpl-sakura",
+  "fx": [],
+  "tplBg": "tpl-forest",
   "tplBgAuto": false,
   "tplBgAutoSec": 8,
   "tplBgs": [
@@ -165,31 +160,31 @@ if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
         document.head.appendChild(l);
     });
 })();</script>
-<title>阚双雪 - 邹洪 - 温故流年 - 自我感动</title>
-<meta name="description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
-<meta property="og:title" content="阚双雪 - 邹洪 - 温故流年 - 自我感动">
-<meta property="og:description" content="这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。">
+<title>时光图库</title>
+<meta name="description" content="一座小小的图库，收藏生活的风景与故事。">
+<meta property="og:title" content="时光图库">
+<meta property="og:description" content="一座小小的图库，收藏生活的风景与故事。">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="温故流年">
+<meta property="og:site_name" content="时光图库">
 <meta property="og:image" content="https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg">
 <meta property="og:image:width" content="2160">
 <meta property="og:image:height" content="1440">
-<meta property="og:image:alt" content="回忆相册封面">
+<meta property="og:image:alt" content="时光图库封面">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "headline": "阚双雪 - 邹洪 - 温故流年 - 自我感动",
-  "description": "这里是邹洪对阚双雪的专属回忆相册，记录一路走来的日常点滴，收藏两个人所有过往瞬间、心事与美好，把曾经的点点滴滴好好留存，定格属于彼此简单珍贵的回忆。",
+  "headline": "时光图库",
+  "description": "一座小小的图库，收藏生活的风景与故事。",
   "image": "https://raw.githubusercontent.com/bxhrdhr/gallery/main/img/demo1.jpg",
   "author": {
     "@type": "Person",
-    "name": "邹洪"
+    "name": "时光图库"
   },
   "publisher": {
     "@type": "Person",
-    "name": "邹洪"
+    "name": "时光图库"
   },
   "datePublished": "2025-11-01",
   "dateModified": "2026-04-07"
@@ -850,8 +845,9 @@ body.intro-lock { overflow: hidden; }
     const musicFiles = (CFG.musics || []).map(function (m) { return m.f; });
     const musicNames = (CFG.musics || []).map(function (m) { return m.name || m.f; });
 
-    const rawImageFiles = (CFG.imgs || []).map(function (it) { return it.f; });
-    const rawImageCats = (CFG.imgs || []).map(function (it) { return it.c || ''; });
+    /* 已禁用的图片（后台「素材库」）不在旧站风格页展示 */
+    const rawImageFiles = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.f; });
+    const rawImageCats = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.c || ''; });
 
 
 
