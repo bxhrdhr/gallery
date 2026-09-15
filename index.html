@@ -262,7 +262,7 @@ var CFG = {
   "pageMode": "ksx",
   "uiTitle": "TIME GALLERY",
   "uiSub": "时光图库",
-  "bg": "cream",
+  "bg": "forest",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -323,12 +323,6 @@ var CFG = {
   ],
   "imgs": [
     {
-      "f": "img/1789468891861_567.jpg",
-      "t": "深圳一日游",
-      "c": "life",
-      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
-    },
-    {
       "f": "img/demo1.jpg",
       "t": "山谷晨光",
       "c": "view",
@@ -341,11 +335,10 @@ var CFG = {
       "_sha": "a4d4c176c9df6f659b0a24b9b5c58fa88cf9d106"
     },
     {
-      "f": "img/demo3.jpg",
-      "t": "傍晚散步",
+      "f": "img/1789468891861_567.jpg",
+      "t": "深圳一日游",
       "c": "life",
-      "_sha": "c0e75001a2c0081db098ca0a412b6e5442ce8a5a",
-      "disabled": true
+      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
     }
   ],
   "musics": [
@@ -371,7 +364,7 @@ var CFG = {
     }
   ],
   "fx": [],
-  "tplBg": "tplbmu3au2bl1",
+  "tplBg": "tpl-forest",
   "tplBgAuto": false,
   "tplBgAutoSec": 8,
   "tplBgs": [
@@ -398,14 +391,9 @@ var CFG = {
       "name": "樱花粉白",
       "type": "grad",
       "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "tplbmu3au2bl1",
-      "name": "1000243474",
-      "type": "img",
-      "url": "bg/1000243474.jpg"
     }
-  ]
+  ],
+  "tplRain": true
 };
 var ASSET_BASE = '';
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
@@ -416,7 +404,7 @@ if ((CFG.pageMode || 'gallery') === 'ksx') {
     kf.id = 'ksxFrame';
     kf.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;z-index:2147483647;background:#0a0d14';
     var fi = document.createElement('iframe');
-    fi.src = (ASSET_BASE || '') + 'template/ksx.html';
+    fi.src = (ASSET_BASE || '') + 'template/ksx.html?v=16';
     fi.style.cssText = 'width:100%;height:100%;border:0';
     fi.setAttribute('title', '旧站风格页面');
     kf.appendChild(fi);
