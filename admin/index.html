@@ -197,11 +197,6 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
     <div class="sec" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px;">
         <h3>旧站模板背景</h3>
         <div class="opt">
-            <span class="nm2">雨滴特效</span>
-            <div class="switch" id="tplRainSw" onclick="toggleTplRain()"><i></i></div>
-        </div>
-        <div style="font-size:11px;color:var(--dim);margin:4px 0 10px;">关闭后雨滴消失，页面只显示下方选择的背景（纯色/图片/动图）</div>
-        <div class="opt">
             <span class="nm2">自动切换背景</span>
             <div class="switch" id="tplBgAutoSw" onclick="toggleTplBgAuto()"><i></i></div>
         </div>
@@ -831,8 +826,6 @@ function ensureTplBgs() {
 }
 function renderTplBgs() {
     ensureTplBgs();
-    if (cfg.tplRain === undefined) cfg.tplRain = true;
-    document.getElementById('tplRainSw').className = 'switch' + (cfg.tplRain ? ' on' : '');
     document.getElementById('tplBgAutoSw').className = 'switch' + (cfg.tplBgAuto ? ' on' : '');
     var box = document.getElementById('tplBgList');
     box.innerHTML = '';
@@ -857,11 +850,6 @@ function delTplBg(id) {
 function toggleTplBgAuto() {
     cfg.tplBgAuto = !cfg.tplBgAuto;
     saveIdx(function () { renderTplBgs(); });
-}
-function toggleTplRain() {
-    if (cfg.tplRain === undefined) cfg.tplRain = true;
-    cfg.tplRain = !cfg.tplRain;
-    saveIdx(function () { renderTplBgs(); msg(cfg.tplRain ? '已开启雨滴特效' : '已关闭雨滴特效，页面只显示选择的背景'); });
 }
 document.getElementById('btnUpTplBg').onclick = function () { document.getElementById('upTplBg').click(); };
 document.getElementById('btnUpTplBgGif').onclick = function () { document.getElementById('upTplBgGif').click(); };
