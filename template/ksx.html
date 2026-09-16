@@ -1445,6 +1445,7 @@ const showImage = (index, dir) => {
 
         w.loadImg = () => {
             w.classList.remove('error', 'loaded');
+            delete w.dataset.rt2;
             img.src = px(ASSET_BASE + fileName.replace('img/', 'img/thumbs/')) + '?v=' + (rawImageShas[globalIndex] || '').slice(0, 8) + (w.dataset.retry ? '&t=' + Date.now() : '');
             w.dataset.retry = 'true';
             clearTimeout(img._t);
@@ -1452,13 +1453,19 @@ const showImage = (index, dir) => {
         };
 
         img.onload = () => {
+            if (!img.naturalWidth || !img.naturalHeight) { img.onerror(new Event('error')); return; }
             w.classList.add('loaded');
             preloadOriginal(fileName);
         };
 
         img.onerror = () => {
             clearTimeout(img._t);
-            if (webpFallback(img)) { img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000); return; }
+            if (!w.dataset.rt2 && img.src.indexOf(GHP) === 0) {
+                w.dataset.rt2 = '1';
+                img.src = img.src.split('&t=')[0] + '&t=' + Date.now();
+                img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000);
+                return;
+            }
             if (pxFallback(img)) { img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000); return; }
             if (!w.dataset.fb && img.src.indexOf('img/thumbs/') > -1) {
                 w.dataset.fb = '1';

@@ -291,6 +291,7 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
 <script>
 /* ================= 基础 ================= */
 var REPO = 'bxhrdhr/gallery';
+var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 var tk = '';
 var idxHtml = '';
 var idxSha = '';
@@ -427,7 +428,7 @@ function renderGrid() {
         if (it.disabled) return;
         var d = document.createElement('div');
         d.className = 'tile' + (selSet[i] ? ' sel' : '');
-        d.innerHTML = '<img src="../' + it.f + '" loading="lazy">' +
+        d.innerHTML = '<img src="' + GHP + it.f.replace('img/', 'img/thumbs/') + '" loading="lazy" onerror="this.onerror=null;this.src=&#39;../' + it.f.replace('img/', 'img/thumbs/') + '&#39;">' +
             '<div class="nm">' + it.t + '</div><div class="tag">' + catName(it.c) + '</div>' +
             '<div class="sel"></div>';
         d.onclick = function () {
@@ -604,7 +605,7 @@ function renderLib() {
         lib.forEach(function (o) {
             var d = document.createElement('div');
             d.className = 'tile';
-            d.innerHTML = '<img src="../' + o.it.f + '" loading="lazy" style="filter:grayscale(.7);opacity:.75;">' +
+            d.innerHTML = '<img src="' + GHP + o.it.f.replace('img/', 'img/thumbs/') + '" loading="lazy" style="filter:grayscale(.7);opacity:.75;" onerror="this.onerror=null;this.src=&#39;../' + o.it.f.replace('img/', 'img/thumbs/') + '&#39;">' +
                 '<div class="nm">' + o.it.t + '</div><div class="tag">' + catName(o.it.c) + '</div>' +
                 '<div style="display:flex;gap:6px;margin-top:6px;width:100%;">' +
                 '<button class="btn sm primary" style="flex:1;" onclick="restoreImg(' + o.i + ')">恢复</button>' +
