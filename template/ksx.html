@@ -3,248 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script>/* 站点配置（与前台 index.html 同一份，后台「保存」会同时同步这里 —— 页面切换模板内容与时光图库同步） */
-var CFG = {
-  "name": "时光图库",
-  "intro": "一座小小的图库，收藏生活的风景与故事。",
-  "pageMode": "ksx",
-  "uiTitle": "SHIGUANG GALLERY",
-  "uiSub": "时光图库",
-  "bg": "bgbg_testjpg",
-  "bgAuto": false,
-  "bgAutoSec": 8,
-  "bgs": [
-    {
-      "id": "cream",
-      "name": "奶油暖光",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"
-    },
-    {
-      "id": "forest",
-      "name": "墨绿森林",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
-    },
-    {
-      "id": "night",
-      "name": "暗夜蓝紫",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
-    },
-    {
-      "id": "sakura",
-      "name": "樱花粉白",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "aurora",
-      "name": "极光青蓝",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
-    },
-    {
-      "id": "bgbg1000241810jpg",
-      "name": "1000241810",
-      "type": "img",
-      "url": "bg/1000241810.jpg"
-    },
-    {
-      "id": "bgbg_testjpg",
-      "name": "bg_test",
-      "type": "img",
-      "url": "bg/bg_test.jpg"
-    }
-  ],
-  "hero": {
-    "eyebrow": "拾光 · 收藏每一帧",
-    "title": "把日子过成画",
-    "sub": "分类收藏 · 慢慢翻阅",
-    "cta": "进入图库"
-  },
-  "cats": [
-    {
-      "id": "all",
-      "name": "全部"
-    },
-    {
-      "id": "life",
-      "name": "生活"
-    },
-    {
-      "id": "view",
-      "name": "风景"
-    },
-    {
-      "id": "food",
-      "name": "美食"
-    }
-  ],
-  "imgs": [
-    {
-      "f": "img/1789522090279_188.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "_sha": "1418306bca1acd598f179a1a40e3ceaa177c40cd",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789530681772_28.jpg",
-      "t": "🌸",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "bfc633f629351c8c0f68098f9c6964b4f18d5778"
-    },
-    {
-      "f": "img/1789530743742_206.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "0f7dc2d87e4f6494de75f77524a82f3b7ba3fa5f"
-    },
-    {
-      "f": "img/1789530749315_970.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "00db67849e93a83a7d85e460330f1b7ba09860ff"
-    },
-    {
-      "f": "img/1789530753783_726.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "0f1484a69e7d4d46ce056f5f817464b6a8d31213"
-    },
-    {
-      "f": "img/1789530759771_931.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "8ff8f6841cb28bb434b20a92cce169c75abd2768"
-    },
-    {
-      "f": "img/1789535158300_254.jpg",
-      "t": "螺蛳粉",
-      "c": "food",
-      "_sha": "0c23f3a5fa7563626662cb34604f7560fe82bea0",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535166977_565.jpg",
-      "t": "鲍鱼豆腐拌面我的评价是又贵又不好吃",
-      "c": "food",
-      "_sha": "14a7d38d7f51bba59b2413c4689a86ab9daf57fd",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535175388_901.jpg",
-      "t": "美食",
-      "c": "food",
-      "_sha": "d7a21625332456582ff9765b7daee466ab49db9b",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535212103_525.jpg",
-      "t": "自己做的杨枝甘露😂",
-      "c": "food",
-      "_sha": "8ae79b6bef62ca12b23f677e1463dbfa1f1e85e2",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535284073_334.jpg",
-      "t": "我自己做的大鸡腿嘎嘎好吃",
-      "c": "food",
-      "_sha": "a81d8a85317425fffc93a41bc371edcbf12e18fd",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535296235_355.jpg",
-      "t": "工厂美食",
-      "c": "food",
-      "_sha": "9a4d33a225146d76f64b1312190ad4aaf0f2ce45",
-      "date": "2026-09-16"
-    }
-  ],
-  "musics": [
-    {
-      "f": "mp3/尾季篇.mp3",
-      "name": "尾季篇",
-      "_sha": "a155ceeb04bfd05e56b1c4b9a1dc6e68ea7e74ff"
-    },
-    {
-      "f": "mp3/失去后才明白.mp3",
-      "name": "失去后才明白",
-      "_sha": "9676397dc1b0e71850e7e7f30682085ac3b67f06"
-    },
-    {
-      "f": "mp3/温柔的徘徊.mp3",
-      "name": "温柔的徘徊",
-      "_sha": "fd7c4885a3d9ddb3a1caade334a65787d2e6fffb"
-    },
-    {
-      "f": "mp3/落日.mp3",
-      "name": "落日",
-      "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"
-    }
-  ],
-  "fx": [
-    "js/全屏/樱花特效.js",
-    "js/点击/水波纹点击特效.js",
-    "js/图片/滤镜特效.js",
-    "js/全屏/飞雪特效.js",
-    "js/图片/图片呼吸特效.js"
-  ],
-  "tplBg": "tplbmu3f6mvv1",
-  "tplBgAuto": false,
-  "tplBgAutoSec": 8,
-  "tplBgs": [
-    {
-      "id": "tpl-cream",
-      "name": "奶油暖光",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"
-    },
-    {
-      "id": "tpl-forest",
-      "name": "墨绿森林",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"
-    },
-    {
-      "id": "tpl-night",
-      "name": "暗夜蓝紫",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"
-    },
-    {
-      "id": "tpl-aurora",
-      "name": "极光青蓝",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"
-    },
-    {
-      "id": "tpl-sakura",
-      "name": "樱花粉白",
-      "type": "grad",
-      "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"
-    },
-    {
-      "id": "tplbmu3f6mvv1",
-      "name": "1000241810",
-      "type": "img",
-      "url": "bg/1000241810.jpg"
-    },
-    {
-      "id": "tplbbg_testjpg",
-      "name": "bg_test",
-      "type": "img",
-      "url": "bg/bg_test.jpg"
-    }
-  ],
-  "tplRain": false
-};
-var ASSET_BASE = '../';   /* 本站资源：相对路径（本页在 template/ 下，上一级即仓库根） */
+var CFG = {"name": "时光图库", "intro": "一座小小的图库，收藏生活的风景与故事。", "pageMode": "ksx", "uiTitle": "SHIGUANG GALLERY", "uiSub": "时光图库", "bg": "bgbg_testjpg", "bgAuto": false, "bgAutoSec": 8, "bgs": [{"id": "cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"}, {"id": "forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"}, {"id": "night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"}, {"id": "sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"}, {"id": "aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"}, {"id": "bgbg1000241810jpg", "name": "1000241810", "type": "img", "url": "bg/1000241810.jpg"}, {"id": "bgbg_testjpg", "name": "bg_test", "type": "img", "url": "bg/bg_test.jpg"}], "hero": {"eyebrow": "拾光 · 收藏每一帧", "title": "把日子过成画", "sub": "分类收藏 · 慢慢翻阅", "cta": "进入图库"}, "cats": [{"id": "all", "name": "全部"}, {"id": "life", "name": "生活"}, {"id": "view", "name": "风景"}, {"id": "food", "name": "美食"}], "imgs": [{"f": "img/1789522090279_188.jpg", "t": "深圳1日游", "c": "life", "_sha": "d861d96ec6c2de24240938a81e9f2a7be80d90af", "date": "2026-09-16"}, {"f": "img/1789530681772_28.jpg", "t": "🌸", "c": "life", "date": "2026-09-16", "_sha": "4b2c5c53f9eb7223e8f3695e5cc66ab246bc8b82"}, {"f": "img/1789530743742_206.jpg", "t": "深圳1日游", "c": "life", "date": "2026-09-16", "_sha": "bf3211b2131baaa5ecc196a6faee96890e71029b"}, {"f": "img/1789530749315_970.jpg", "t": "深圳1日游", "c": "life", "date": "2026-09-16", "_sha": "e1e45b537af3c6392b54cb107a97b85a23028b8f"}, {"f": "img/1789530753783_726.jpg", "t": "深圳1日游", "c": "life", "date": "2026-09-16", "_sha": "aa5e108ccaa7a90cb6b5e618c1d71af4d97db917"}, {"f": "img/1789530759771_931.jpg", "t": "深圳1日游", "c": "life", "date": "2026-09-16", "_sha": "c4a5afb55a8a025bc14c6e5616f1aa1e30abb6ff"}, {"f": "img/1789535158300_254.jpg", "t": "螺蛳粉", "c": "food", "_sha": "2755aa27d08f96528eda0819db91315cd51020e3", "date": "2026-09-16"}, {"f": "img/1789535166977_565.jpg", "t": "鲍鱼豆腐拌面我的评价是又贵又不好吃", "c": "food", "_sha": "ddc32affd5d374b4ccb4c8de9d089c09b9d81294", "date": "2026-09-16"}, {"f": "img/1789535175388_901.jpg", "t": "美食", "c": "food", "_sha": "5699884951124be10e0aba7a2b09f1c9943ee01e", "date": "2026-09-16"}, {"f": "img/1789535212103_525.jpg", "t": "自己做的杨枝甘露😂", "c": "food", "_sha": "d5af4651db52bec437f9291c37341efdf715e13c", "date": "2026-09-16"}, {"f": "img/1789535284073_334.jpg", "t": "我自己做的大鸡腿嘎嘎好吃", "c": "food", "_sha": "b435feccffa3129f5161a93bdd4674974bf4aed0", "date": "2026-09-16"}, {"f": "img/1789535296235_355.jpg", "t": "工厂美食", "c": "food", "_sha": "5ff91907404e5b460272e4f623aabde57a118393", "date": "2026-09-16"}], "musics": [{"f": "mp3/尾季篇.mp3", "name": "尾季篇", "_sha": "a155ceeb04bfd05e56b1c4b9a1dc6e68ea7e74ff"}, {"f": "mp3/失去后才明白.mp3", "name": "失去后才明白", "_sha": "9676397dc1b0e71850e7e7f30682085ac3b67f06"}, {"f": "mp3/温柔的徘徊.mp3", "name": "温柔的徘徊", "_sha": "fd7c4885a3d9ddb3a1caade334a65787d2e6fffb"}, {"f": "mp3/落日.mp3", "name": "落日", "_sha": "b2956ec6e42b0a681ef4ef8b37dea122a49ef19a"}], "fx": ["js/全屏/樱花特效.js", "js/点击/水波纹点击特效.js", "js/图片/滤镜特效.js", "js/全屏/飞雪特效.js", "js/图片/图片呼吸特效.js"], "tplBg": "tplbmu3f6mvv1", "tplBgAuto": false, "tplBgAutoSec": 8, "tplBgs": [{"id": "tpl-cream", "name": "奶油暖光", "type": "grad", "css": "linear-gradient(165deg,#fdf8f0,#f5ead9 55%,#efe0c8)"}, {"id": "tpl-forest", "name": "墨绿森林", "type": "grad", "css": "linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)"}, {"id": "tpl-night", "name": "暗夜蓝紫", "type": "grad", "css": "linear-gradient(165deg,#232a4d,#181d36 55%,#0b0d1d)"}, {"id": "tpl-aurora", "name": "极光青蓝", "type": "grad", "css": "linear-gradient(165deg,#0d3f46,#0a2f38 55%,#071c24)"}, {"id": "tpl-sakura", "name": "樱花粉白", "type": "grad", "css": "linear-gradient(165deg,#fff7f6,#fde8e6 55%,#fbdcd6)"}, {"id": "tplbmu3f6mvv1", "name": "1000241810", "type": "img", "url": "bg/1000241810.jpg"}, {"id": "tplbbg_testjpg", "name": "bg_test", "type": "img", "url": "bg/bg_test.jpg"}], "tplRain": false}; = '../';   /* 本站资源：相对路径（本页在 template/ 下，上一级即仓库根） */
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>时光图库</title>
@@ -1322,12 +1081,20 @@ const showImage = (index, dir) => {
     currentImgIndex = index;
     const f = imageFiles[index];
     const imgSrc = ASSET_BASE + f + '?v=' + (rawImageShas[index] || '').slice(0, 8);
+    const tmbSrc = ASSET_BASE + f.replace('img/', 'img/thumbs/') + '?v=' + (rawImageShas[index] || '').slice(0, 8);
     // 防残留/竞态：自增 token，只有最新一次加载完成才真正显示，避免短暂显示上一张/错图
     const token = ++imgToken;
     vImg.style.opacity = '0';
     vImg.onload = () => { if (token === imgToken) vImg.style.opacity = '1'; };
     vImg.onerror = () => { if (token === imgToken) vImg.style.opacity = '1'; };
-    vImg.src = imgSrc;
+    vImg.src = tmbSrc;
+    vImg.onload = () => {
+        if (token !== imgToken) return;
+        vImg.style.opacity = '1';
+        var _bi = new Image();
+        _bi.onload = function () { if (token === imgToken) vImg.src = imgSrc; };
+        _bi.src = imgSrc;
+    };
     v.style.display = 'flex';
     const target = vImg;
 
