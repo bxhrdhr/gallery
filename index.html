@@ -161,7 +161,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 .lb.show { opacity: 1; pointer-events: auto; }
 .lb img { max-width: 92vw; max-height: 84vh; border-radius: 12px; }
-.lb .lb-close { position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.16); color: #fff; font-size: 18px; cursor: pointer; }
 .lb .lb-prev, .lb .lb-next { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,.16); color: #fff; font-size: 18px; cursor: pointer; }
 .lb .lb-prev { left: 14px; } .lb .lb-next { right: 14px; }
 .lb .lb-name { position: absolute; bottom: 26px; left: 0; right: 0; text-align: center; color: #fff; font-size: 13px; letter-spacing: .14em; }
@@ -225,7 +224,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 <!-- 灯箱 -->
 <div class="lb" id="lb">
-    <button class="lb-close" id="lbClose" type="button">✕</button>
     <button class="lb-prev" id="lbPrev" type="button">‹</button>
     <img id="lbImg" alt="" draggable="false">
     <button class="lb-next" id="lbNext" type="button">›</button>
@@ -563,10 +561,13 @@ function showLb() {
     lb.classList.add('show');
 }
 document.getElementById('stageMain').onclick = function () { if (list.length) showLb(); };
-document.getElementById('lbClose').onclick = function () { lb.classList.remove('show'); };
 document.getElementById('lbPrev').onclick = function () { if (list.length) { curIdx = (curIdx - 1 + list.length) % list.length; showLb(); renderStage(); } };
 document.getElementById('lbNext').onclick = function () { if (list.length) { curIdx = (curIdx + 1) % list.length; showLb(); renderStage(); } };
-lb.onclick = function (e) { if (e.target === lb) lb.classList.remove('show'); };
+lb.onclick = function (e) {
+    var t = e.target;
+    if (t.id === 'lbPrev' || t.id === 'lbNext') return;
+    lb.classList.remove('show');
+};
 
 /* ---------- 悬浮二次元播放器 ---------- */
 /* 已禁用的音乐（后台「音乐素材库」）不播放 */
