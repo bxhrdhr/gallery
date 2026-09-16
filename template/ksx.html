@@ -756,11 +756,8 @@ body.intro-lock { overflow: hidden; }
 </head>
 <body>
 <style>
-/* 背景层：容器由后台「插件 → 背景插件」控制，存在即显示；底色半透明以便透出下层页面背景 */
-#glass-rain .gr-deps{display:none}
 /* 页面背景（后台「背景」页管理：渐变/图片/动图） */
 #bgTpl{position:fixed;inset:0;z-index:-2;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat;transition:background .5s ease}
-/* 玻璃雨珠容器强制透明：只留雨滴，页面背景（#bgTpl）永远不被盖住 */
 </style>
 <!-- ===== 开场：星夜回忆 ===== -->
 <div id="intro" class="intro">
@@ -1350,7 +1347,6 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
     /* ---- 旧站模板背景：读 CFG.tplBg / CFG.tplBgs（后台「背景」页「旧站模板背景」区块管理，与时光图库背景相互独立） ---- */
     function applyBgTpl() {
         var el = document.getElementById('bgTpl');
-        var rain = document.getElementById('glass-rain');
         if (!el) return;
         var b = null;
         var bs = CFG.tplBgs || [];
@@ -1358,10 +1354,8 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
         if (!b) { el.style.background = 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)'; return; }
         if (b.type === 'img' && b.url) {
             el.style.background = 'url(' + ASSET_BASE + b.url + ') center/cover no-repeat';
-            if (rain) rain.style.display = 'none';   /* 图片/动图背景时隐藏雨珠特效，避免遮挡 */
         } else {
             el.style.background = b.css || 'linear-gradient(165deg,#24402e,#1a3223 55%,#0c1a11)';
-            if (rain) rain.style.display = '';
         }
     }
     var tplBgTimer = null, tplBgIdx = 0;
