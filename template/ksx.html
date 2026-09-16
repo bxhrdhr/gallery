@@ -1098,7 +1098,7 @@ const showImage = (index, dir) => {
         vImg.style.opacity = '1';
         var _bi = new Image();
         _bi.onload = function () { if (token === imgToken) vImg.src = imgSrc; };
-        _bi.onerror = function () { if (!_bi.dataset.fb) { _bi.dataset.fb = '1'; _bi.src = imgSrc; } };
+        _bi.onerror = function () { if (!_bi.dataset.fb) { _bi.dataset.fb = '1'; pxFallback(_bi); } };
         _bi.src = px(imgSrc);
     };
     v.style.display = 'flex';
