@@ -9,7 +9,7 @@ var CFG = {
   "pageMode": "gallery",
   "uiTitle": "SHIGUANG GALLERY",
   "uiSub": "时光图库",
-  "bg": "sakura",
+  "bg": "bgbg1000241810jpg",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -48,6 +48,12 @@ var CFG = {
       "name": "1000241810",
       "type": "img",
       "url": "bg/1000241810.jpg"
+    },
+    {
+      "id": "bgbg_testjpg",
+      "name": "bg_test",
+      "type": "img",
+      "url": "bg/bg_test.jpg"
     }
   ],
   "hero": {
@@ -79,7 +85,7 @@ var CFG = {
       "f": "img/1789522090279_188.jpg",
       "t": "深圳1日游",
       "c": "life",
-      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c",
+      "_sha": "1418306bca1acd598f179a1a40e3ceaa177c40cd",
       "date": "2026-09-16"
     },
     {
@@ -87,35 +93,77 @@ var CFG = {
       "t": "🌸",
       "c": "life",
       "date": "2026-09-16",
-      "_sha": "a7cf71ce2f09cd855c6e86cca99f3a47bd5afac2"
+      "_sha": "bfc633f629351c8c0f68098f9c6964b4f18d5778"
     },
     {
       "f": "img/1789530743742_206.jpg",
       "t": "深圳1日游",
       "c": "life",
       "date": "2026-09-16",
-      "_sha": "e5fab1b764b8b2a818375dfe9794e2b253e3fd2e"
+      "_sha": "0f7dc2d87e4f6494de75f77524a82f3b7ba3fa5f"
     },
     {
       "f": "img/1789530749315_970.jpg",
       "t": "深圳1日游",
       "c": "life",
       "date": "2026-09-16",
-      "_sha": "6652f4d76d0513ccb93107afbf0aa3ce37efc4ef"
+      "_sha": "00db67849e93a83a7d85e460330f1b7ba09860ff"
     },
     {
       "f": "img/1789530753783_726.jpg",
       "t": "深圳1日游",
       "c": "life",
       "date": "2026-09-16",
-      "_sha": "ec53a333b6e3de9d4eb09bb62aaaad86d5269474"
+      "_sha": "0f1484a69e7d4d46ce056f5f817464b6a8d31213"
     },
     {
       "f": "img/1789530759771_931.jpg",
       "t": "深圳1日游",
       "c": "life",
       "date": "2026-09-16",
-      "_sha": "af368aa8eed0ba9167e654d572e7b95a006e4308"
+      "_sha": "8ff8f6841cb28bb434b20a92cce169c75abd2768"
+    },
+    {
+      "f": "img/1789535158300_254.jpg",
+      "t": "螺蛳粉",
+      "c": "food",
+      "_sha": "0c23f3a5fa7563626662cb34604f7560fe82bea0",
+      "date": "2026-09-16"
+    },
+    {
+      "f": "img/1789535166977_565.jpg",
+      "t": "鲍鱼豆腐拌面我的评价是又贵又不好吃",
+      "c": "food",
+      "_sha": "14a7d38d7f51bba59b2413c4689a86ab9daf57fd",
+      "date": "2026-09-16"
+    },
+    {
+      "f": "img/1789535175388_901.jpg",
+      "t": "美食",
+      "c": "food",
+      "_sha": "d7a21625332456582ff9765b7daee466ab49db9b",
+      "date": "2026-09-16"
+    },
+    {
+      "f": "img/1789535212103_525.jpg",
+      "t": "自己做的杨枝甘露😂",
+      "c": "food",
+      "_sha": "8ae79b6bef62ca12b23f677e1463dbfa1f1e85e2",
+      "date": "2026-09-16"
+    },
+    {
+      "f": "img/1789535284073_334.jpg",
+      "t": "我自己做的大鸡腿嘎嘎好吃",
+      "c": "food",
+      "_sha": "a81d8a85317425fffc93a41bc371edcbf12e18fd",
+      "date": "2026-09-16"
+    },
+    {
+      "f": "img/1789535296235_355.jpg",
+      "t": "工厂美食",
+      "c": "food",
+      "_sha": "9a4d33a225146d76f64b1312190ad4aaf0f2ce45",
+      "date": "2026-09-16"
     }
   ],
   "musics": [
@@ -145,8 +193,7 @@ var CFG = {
     "js/点击/水波纹点击特效.js",
     "js/图片/滤镜特效.js",
     "js/全屏/飞雪特效.js",
-    "js/图片/图片呼吸特效.js",
-    "js/人民币.js"
+    "js/图片/图片呼吸特效.js"
   ],
   "tplBg": "tplbmu3f6mvv1",
   "tplBgAuto": false,
@@ -187,6 +234,12 @@ var CFG = {
       "name": "1000241810",
       "type": "img",
       "url": "bg/1000241810.jpg"
+    },
+    {
+      "id": "tplbbg_testjpg",
+      "name": "bg_test",
+      "type": "img",
+      "url": "bg/bg_test.jpg"
     }
   ],
   "tplRain": false
@@ -1244,7 +1297,7 @@ body.intro-lock { overflow: hidden; }
         step();
     };
     const preloadOriginal = (fileName) => {
-        const src = ASSET_BASE + fileName + '?v=1';
+        const src = ASSET_BASE + fileName;
         if (origDone.has(src)) return;
         origDone.add(src);
         origQueue.push(src);
