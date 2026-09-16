@@ -79,14 +79,14 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .back {
     border: 1px solid var(--line); background: var(--card); color: var(--ink);
     width: 40px; height: 40px; border-radius: 12px; font-size: 16px; cursor: pointer;
-    flex: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    flex: none;
 }
 .album-title { font-size: 15px; font-weight: 700; letter-spacing: .14em; color: var(--ink); flex: none; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* ============ 标题行长条播放器 ============ */
 .hbar {
     flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
     height: 38px; border-radius: 19px; padding: 0 6px 0 4px;
-    background: rgba(0,0,0,.38); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    background: rgba(0,0,0,.55);
     box-shadow: 0 4px 14px rgba(0,0,0,.16);
 }
 .hb-play, .hb-next {
@@ -107,7 +107,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .cat {
     flex: none; border: 1px solid var(--line); background: var(--card); color: var(--ink2);
     padding: 8px 18px; border-radius: 999px; font-size: 12px; letter-spacing: .14em;
-    cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
     transition: all .25s ease;
 }
 .cat.on { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
@@ -115,7 +115,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 /* 大图区 */
 .stage {
     position: relative; width: 100%; height: 46dvh; border-radius: 20px; overflow: hidden;
-    background: var(--card); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: var(--card);
     box-shadow: 0 18px 44px rgba(0,0,0,.14);
 }
 .stage-main { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
@@ -123,7 +123,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .stage-cap {
     position: absolute; left: 12px; right: 12px; bottom: 12px;
     display: flex; align-items: center; gap: 10px;
-    background: rgba(0,0,0,.32); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    background: rgba(0,0,0,.55);
     border-radius: 12px; padding: 10px 14px;
 }
 .stage-cap b { color: #fff; font-size: 14px; letter-spacing: .1em; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -539,7 +539,10 @@ function renderStage() {
     if (curIdx >= list.length) curIdx = list.length - 1;
     if (curIdx < 0) curIdx = 0;
     var it = list[curIdx];
-    document.getElementById('stageImg').src = ASSET_BASE + it.f;
+    var sImg = document.getElementById('stageImg');
+    sImg.style.opacity = '0';
+    sImg.onload = function () { sImg.style.transition = 'opacity .25s ease'; sImg.style.opacity = '1'; };
+    sImg.src = ASSET_BASE + it.f;
     document.getElementById('stageName').textContent = it.t;
     document.getElementById('stageCat').textContent = catName(it.c);
     document.getElementById('stageDate').textContent = it.date ? '上传于 ' + it.date : '';
