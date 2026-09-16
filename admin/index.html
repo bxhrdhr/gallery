@@ -780,9 +780,12 @@ function renderBgs() {
 function delBg(id) {
     if (!confirm('删除这个背景？删除后不可恢复（当前使用会自动切到第一个）')) return;
     ensureBgs();
-    cfg.bgs = cfg.bgs.filter(function (b) { return b.id !== id; });
+    var rm = null;
+    cfg.bgs = cfg.bgs.filter(function (b) { if (b.id === id) { rm = b; return false; } return true; });
     if (cfg.bg === id) cfg.bg = cfg.bgs.length ? cfg.bgs[0].id : 'cream';
-    saveIdx(function () { renderBgs(); });
+    if (rm && rm.url) cfg.tplBgs = (cfg.tplBgs || []).filter(function (b) { return b.url !== rm.url; });
+    if (rm && rm.url && cfg.tplBgs.length && cfg.tplBg && !cfg.tplBgs.some(function (b) { return b.id === cfg.tplBg; })) cfg.tplBg = cfg.tplBgs[0].id;
+    saveIdx(function () { renderBgs(); renderTplBgs(); });
 }
 function toggleBgAuto() {
     cfg.bgAuto = !cfg.bgAuto;
@@ -806,7 +809,8 @@ function uploadBgFiles(files) {
             var b64 = rd.result.split(',')[1];
             api('/contents/' + path, 'PUT', { message: 'Add bg ' + nm, content: b64 }).then(function (r) {
                 cfg.bgs.push({ id: 'bg' + Date.now().toString(36) + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
-                saveIdx(function () { renderBgs(); next(); });
+                cfg.tplBgs.push({ id: 'tplb' + Date.now().toString(36) + 's' + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
+                saveIdx(function () { renderBgs(); renderTplBgs(); next(); });
             }).catch(function (e) { msg('背景上传失败'); next(); });
         };
         rd.readAsDataURL(f);
@@ -843,9 +847,12 @@ function renderTplBgs() {
 function delTplBg(id) {
     if (!confirm('删除这个背景？删除后不可恢复（当前使用会自动切到第一个）')) return;
     ensureTplBgs();
-    cfg.tplBgs = cfg.tplBgs.filter(function (b) { return b.id !== id; });
+    var rm = null;
+    cfg.tplBgs = cfg.tplBgs.filter(function (b) { if (b.id === id) { rm = b; return false; } return true; });
     if (cfg.tplBg === id) cfg.tplBg = cfg.tplBgs.length ? cfg.tplBgs[0].id : 'tpl-forest';
-    saveIdx(function () { renderTplBgs(); });
+    if (rm && rm.url) cfg.bgs = (cfg.bgs || []).filter(function (b) { return b.url !== rm.url; });
+    if (rm && rm.url && cfg.bgs.length && cfg.bg && !cfg.bgs.some(function (b) { return b.id === cfg.bg; })) cfg.bg = cfg.bgs[0].id;
+    saveIdx(function () { renderBgs(); renderTplBgs(); });
 }
 function toggleTplBgAuto() {
     cfg.tplBgAuto = !cfg.tplBgAuto;
@@ -869,7 +876,8 @@ function uploadTplBgFiles(files) {
             var b64 = rd.result.split(',')[1];
             api('/contents/' + path, 'PUT', { message: 'Add tpl bg ' + nm, content: b64 }).then(function (r) {
                 cfg.tplBgs.push({ id: 'tplb' + Date.now().toString(36) + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
-                saveIdx(function () { renderTplBgs(); next(); });
+                cfg.bgs.push({ id: 'bg' + Date.now().toString(36) + 's' + i, name: nm.replace(/\.[^.]+$/, ''), type: 'img', url: path });
+                saveIdx(function () { renderBgs(); renderTplBgs(); next(); });
             }).catch(function (e) { msg('背景上传失败'); next(); });
         };
         rd.readAsDataURL(f);
