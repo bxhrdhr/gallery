@@ -12,7 +12,7 @@
     var flakeCount = 250;
 
     canvas.id = "snow_canvas_overlay";
-    canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;pointer-events:none;";
+    canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;";
     document.body.appendChild(canvas);
 
     function resize() {
