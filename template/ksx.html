@@ -263,8 +263,8 @@ function webpFallback() { return false; }  /* jpg 重复文件已删除，不再
     --accent-gold: #d4af37;
     --col-mobile-default: 4;
     --col-mobile-toggle: 5;
-    --col-pc-default: 11;
-    --col-pc-toggle: 13;
+    --col-pc-default: 4;
+    --col-pc-toggle: 7;
 }
 
 
@@ -340,10 +340,17 @@ body {
 @media (min-width: 768px) {
     .header { padding: 50px 20px 40px; }
     .subtitle { font-size: 24px; }
+    .nav-container { bottom: 22px; padding-bottom: 20px; }
+    .nav { max-width: 560px; height: 60px; border-radius: 30px; }
+    .btn { width: 42px; height: 42px; }
+    .btn svg { width: 22px; height: 22px; }
+    .btn-l svg { width: 24px; height: 24px; }
+    #p { width: 46px; height: 46px; }
+    #ml, #catMenu { bottom: 130px; }
     #c { 
         max-width: 1500px; margin: 0 auto;
-        grid-template-columns: repeat(var(--col-pc-default), 1fr); 
-        gap: 16px; padding: 0 40px 120px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+        gap: 18px; padding: 0 40px 140px;
     }
     #c.dense { grid-template-columns: repeat(var(--col-pc-toggle), 1fr); }
 }
