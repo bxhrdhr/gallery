@@ -527,7 +527,7 @@ document.getElementById('upFiles').onchange = function () {
         var rd = new FileReader();
         rd.onload = function () {
             api('/contents/' + fn, 'PUT', { message: 'Up ' + fn, content: rd.result.split(',')[1] }).then(function () {
-                cfg.imgs.push({ f: fn, t: f.name.replace(/\.[^.]+$/, ''), c: cat });
+                cfg.imgs.push({ f: fn, t: f.name.replace(/\.[^.]+$/, ''), c: cat, date: new Date().toISOString().slice(0, 10) });
                 i++;
                 msg('上传中 ' + i + '/' + files.length);
                 if (i === files.length) {
