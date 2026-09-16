@@ -1321,7 +1321,7 @@ const showImage = (index, dir) => {
     index = (index + imageFiles.length) % imageFiles.length;
     currentImgIndex = index;
     const f = imageFiles[index];
-    const imgSrc = ASSET_BASE + f;
+    const imgSrc = ASSET_BASE + f + '?v=' + (rawImageShas[index] || '').slice(0, 8);
     // 防残留/竞态：自增 token，只有最新一次加载完成才真正显示，避免短暂显示上一张/错图
     const token = ++imgToken;
     vImg.style.opacity = '0';
