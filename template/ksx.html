@@ -73,7 +73,8 @@ var CFG = {
       "f": "img/1789522090279_188.jpg",
       "t": "深圳1日游",
       "c": "life",
-      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c"
+      "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c",
+      "date": "2026-09-16"
     }
   ],
   "musics": [
@@ -373,6 +374,14 @@ img:not([src]), img[src=""], img:-moz-broken {
     animation: zoomIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     transition: opacity 0.3s ease;
     filter: none;
+}
+.v-date {
+    position: absolute; left: 0; right: 0; bottom: 36px; text-align: center;
+    color: rgba(255,255,255,.85); font-size: 13px; letter-spacing: .12em;
+    text-shadow: 0 2px 8px rgba(0,0,0,.6); pointer-events: none; z-index: 3;
+}
+@media (min-width: 768px) {
+    #v img { max-height: 88vh; }
 }
 
 @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -782,7 +791,7 @@ body.intro-lock { overflow: hidden; }
 </div>
 <div class="catbar" id="catbar"></div>
 <div id="c"></div>
-<div id="v"><img></div>
+<div id="v"><img><div class="v-date" id="vDate"></div></div>
 <div class="t"></div>
 <div id="ml"></div>
 <div id="catMenu"></div>
@@ -831,12 +840,14 @@ body.intro-lock { overflow: hidden; }
     /* 已禁用的图片（后台「素材库」）不在旧站风格页展示 */
     const rawImageFiles = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.f; });
     const rawImageCats = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.c || ''; });
+    const rawImageDates = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.date || ''; });
 
 
 
 
 
     let imageFiles = rawImageFiles.slice();
+    let imageDates = rawImageDates.slice();
 
     /* ---- 分类：优先用时光图库后台的分类（内容同步）；无分类时按文件名自动分组 ---- */
     let curCat = 'all';
@@ -894,8 +905,9 @@ body.intro-lock { overflow: hidden; }
             b.onclick = function () {
                 curCat = cc.id;
                 imageFiles = [];
+                imageDates = [];
                 for (var i = 0; i < rawImageFiles.length; i++) {
-                    if (curCat === 'all' || catOf(rawImageFiles[i], i) === curCat) imageFiles.push(rawImageFiles[i]);
+                    if (curCat === 'all' || catOf(rawImageFiles[i], i) === curCat) { imageFiles.push(rawImageFiles[i]); imageDates.push(rawImageDates[i]); }
                 }
                 var container = document.getElementById('c');
                 container.innerHTML = '';
@@ -1227,6 +1239,9 @@ const showImage = (index, dir) => {
       //点击显示时间
     else if (dir === 'prev') target.style.animation = 'slidePrev 0.4s ease-out forwards';
     else target.style.animation = 'softZoom 0.3s ease-out forwards';
+
+    var vDate = document.getElementById('vDate');
+    if (vDate) vDate.textContent = imageDates[index] ? '上传于 ' + imageDates[index] : '';
 
     preloadImage(index + 1);
     preloadImage(index - 1);
