@@ -1416,7 +1416,7 @@ const showImage = (index, dir) => {
 
         w.loadImg = () => {
             w.classList.remove('error', 'loaded');
-            img.src = ASSET_BASE + fileName + '?v=' + (rawImageShas[globalIndex] || '').slice(0, 8) + (w.dataset.retry ? '&t=' + Date.now() : '');
+            img.src = ASSET_BASE + fileName.replace('img/', 'img/thumbs/') + '?v=' + (rawImageShas[globalIndex] || '').slice(0, 8) + (w.dataset.retry ? '&t=' + Date.now() : '');
             w.dataset.retry = 'true';
         };
 
