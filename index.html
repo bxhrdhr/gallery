@@ -671,7 +671,7 @@ var lb = document.getElementById('lb');
 function showLb() {
     if (!list.length) return;
     var it = list[curIdx];
-    document.getElementById('lbImg').src = ASSET_BASE + it.f;
+    document.getElementById('lbImg').src = ASSET_BASE + it.f + ((it._sha || '').slice(0, 8) ? '?v=' + (it._sha || '').slice(0, 8) : '');
     document.getElementById('lbName').textContent = it.t + (catName(it.c) ? ' · ' + catName(it.c) : '');
     lb.classList.add('show');
 }
