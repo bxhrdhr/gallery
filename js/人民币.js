@@ -1,168 +1,132 @@
-/* 人民币（金币）飘落特效 —— 优化版
- * 纯 JS、自包含（canvas 直接绘制金币，不依赖任何图片）
- * 修复：原文件是 HTML 无法作为脚本执行、leaf.png 不存在导致 404、resize 时 ctx.scale 累积放大
- */
-(function () {
-    'use strict';
+// 人民币爱心轨迹下落 - 樱花般流畅飘落版
+// 改动说明：①图片由抖音外链改为本站资源 js/money.png（避免失效，符合本站内容要求）；②z-index 由 -1 改为 9999（否则被页面背景盖住看不到）；③图片路径按脚本所在目录自动解析
+(function() {
+    // 脚本所在目录（供本站图片定位）
+    var SCRIPT_DIR = (function () {
+        var s = document.currentScript || document.scripts[document.scripts.length - 1];
+        if (s && s.src) return s.src.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+        return '';
+    })();
 
-    // 1. 注入样式（透明覆盖层，不拦截点击）
-    if (!document.getElementById('coinFxStyle')) {
-        var st = document.createElement('style');
-        st.id = 'coinFxStyle';
-        st.textContent = '#coinCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;pointer-events:none;}';
-        document.head.appendChild(st);
-    }
-
-    // 2. 创建画布
-    var canvas = document.getElementById('coinCanvas');
-    if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.id = 'coinCanvas';
-        document.body.appendChild(canvas);
-    }
-    var ctx = canvas.getContext('2d');
-    var animationId = null;
-    var isAnimating = false;
-
-    // 3. 高清适配（用 setTransform 避免重复 resize 累积放大）
-    var resizeTimer = null;
-    function resizeCanvas() {
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        var w = window.innerWidth, h = window.innerHeight;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    window.addEventListener('resize', function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(resizeCanvas, 100);
-    });
-
-    // 4. 金币对象
-    function Coin() {
-        this.reset();
-        this.swingAmplitude = Math.random() * 8 + 3;
-        this.swingPhase = Math.random() * Math.PI * 2;
-        this.isLanded = false;
-    }
-    Coin.prototype.reset = function () {
-        this.x = Math.random() * window.innerWidth;
-        this.y = Math.random() * -window.innerHeight * 0.5;
-        this.r = Math.random() * 8 + 12;                 // 金币半径
-        this.speedY = Math.random() * 1.5 + 0.8;
-        this.speedX = Math.random() * 1.2 - 0.6;
-        this.angle = Math.random() * Math.PI * 2;
-        this.rotateSpeed = Math.random() * 0.02 - 0.01;
-        this.alpha = Math.random() * 0.2 + 0.8;
-        this.fadeThreshold = 200;
-        this.targetAlpha = 0;
-        this.fadeSpeed = 0.005;
-        this.isLanded = false;
-    };
-    Coin.prototype.update = function () {
-        if (this.isLanded) return;
-        this.x += this.speedX + Math.sin(this.swingPhase) * this.swingAmplitude * 0.04;
-        this.y += this.speedY;
-        this.angle += this.rotateSpeed;
-        this.swingPhase += 0.04;
-        var d = window.innerHeight - this.y;
-        if (d < this.fadeThreshold) {
-            this.targetAlpha = (d / this.fadeThreshold) * 0.8;
-            this.alpha = Math.max(this.targetAlpha, this.alpha - this.fadeSpeed);
+    const style = document.createElement('style');
+    style.textContent = `
+       .money-wrap {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 120vh;
+             z-index: 9999;
+             pointer-events: none;
+             overflow: hidden;
+         }
+         .money {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            background-size: 100% 100%;
+            transform: translate3d(0, 0, 0);
+            will-change: transform, opacity;
+            /* 改用樱花飘落的缓动函数，下落更轻盈 */
+            animation: loveFallSmooth 12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            filter: blur(0px);
         }
-        if (this.y > window.innerHeight + this.r * 2 || this.alpha <= 0) {
-            this.isLanded = true;
+
+        @keyframes loveFallSmooth {
+            0% {
+                transform: translate3d(var(--x), var(--y-start), 0) rotate(0deg) scale(1);
+                opacity: 1;
+                filter: blur(0px);
+            }
+            35% {
+                /* 加入左右随机摇摆偏移，模拟樱花飘动 */
+                transform: translate3d(calc(var(--x-end) + var(--random-sway)), 35vh, 0) rotate(var(--rotate-1)) scale(1);
+                opacity: 1;
+                filter: blur(0px);
+            }
+            70% {
+                transform: translate3d(calc(var(--x-end) - var(--random-sway)), 70vh, 0) rotate(var(--rotate-2)) scale(0.97);
+                opacity: 0.6;
+                filter: blur(0.5px);
+            }
+            100% {
+                transform: translate3d(calc(var(--x-end) + var(--random-sway)/2), 115vh, 0) rotate(var(--rotate-3)) scale(0.92);
+                opacity: 0;
+                filter: blur(1px);
+            }
         }
-    };
-    Coin.prototype.draw = function () {
-        if (this.isLanded || this.alpha <= 0) return;
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
-        // 金币本体：金色径向渐变圆
-        ctx.beginPath();
-        ctx.arc(0, 0, this.r, 0, Math.PI * 2);
-        var g = ctx.createRadialGradient(-this.r * 0.3, -this.r * 0.3, this.r * 0.1, 0, 0, this.r);
-        g.addColorStop(0, '#fff3c4');
-        g.addColorStop(0.45, '#f7c948');
-        g.addColorStop(1, '#c8901a');
-        ctx.fillStyle = g;
-        ctx.fill();
-        ctx.lineWidth = this.r * 0.12;
-        ctx.strokeStyle = 'rgba(140,96,20,0.9)';
-        ctx.stroke();
-        // 内圈
-        ctx.beginPath();
-        ctx.arc(0, 0, this.r * 0.68, 0, Math.PI * 2);
-        ctx.lineWidth = this.r * 0.06;
-        ctx.strokeStyle = 'rgba(168,116,26,0.7)';
-        ctx.stroke();
-        // 人民币符号 ¥
-        ctx.fillStyle = '#8a5a12';
-        ctx.font = 'bold ' + Math.round(this.r * 1.05) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('¥', 0, 1);
-        ctx.restore();
+    `;
+    document.head.appendChild(style);
+
+    const config = {
+        imgSrc: SCRIPT_DIR + 'money.png',
+        count: 80,
+        heartSize: 180,
+        heartCenterX: window.innerWidth / 2,
+        heartCenterY: -230,
+        tMin: 0.45 * Math.PI,
+        tMax: 1.45 * Math.PI,
+        endXOffset: 10,
+        // 新增：樱花飘落的随机参数范围
+        swayRange: 20,   // 左右摇摆幅度
+        rotateRange: 15  // 旋转角度范围
     };
 
-    // 5. 初始化与动画
-    var coinCount = 120;
-    var coins = [];
-    function initCoins() {
-        coins.length = 0;
-        for (var i = 0; i < coinCount; i++) coins.push(new Coin());
-    }
-    function animate() {
-        if (!isAnimating) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        var active = 0;
-        for (var i = 0; i < coins.length; i++) {
-            var c = coins[i];
-            if (!c.isLanded) { c.update(); c.draw(); active++; }
-        }
-        if (active === 0) {
-            cancelAnimationFrame(animationId);
-            canvas.style.display = 'none';
-            isAnimating = false;
-            return;
-        }
-        animationId = requestAnimationFrame(animate);
+    const wrap = document.createElement('div');
+    wrap.className = 'money-wrap';
+    document.body.appendChild(wrap);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = config.imgSrc;
+    img.onload = createHeartMoney;
+    img.onerror = () => console.error('人民币图片加载失败：' + config.imgSrc);
+
+    function getHeartPoint(t) {
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        return {
+            x: config.heartCenterX + x * (config.heartSize / 16),
+            y: config.heartCenterY + y * (config.heartSize / 16)
+        };
     }
 
-    resizeCanvas();
-    initCoins();
-    canvas.style.display = 'block';
-    isAnimating = true;
-    animate();
+    function createHeartMoney() {
+        let created = 0;
+        const batch = 4;
+        const interval = 220;
+        const timer = setInterval(() => {
+            for (let i = 0; i < batch; i++) {
+                if (created >= config.count) {
+                    clearInterval(timer);
+                    return;
+                }
+                const t = config.tMin + Math.random() * (config.tMax - config.tMin);
+                const point = getHeartPoint(t);
+                const endX = point.x + (Math.random() - 0.5) * config.endXOffset;
 
-    // 6. 控制接口（与后台/页面兼容）
-    window.coinFx = window.leafEffect = {
-        setLeafCount: function (n) {
-            if (n < 20) n = 20;
-            coinCount = n;
-            initCoins();
-        },
-        setCoinCount: function (n) {
-            if (n < 20) n = 20;
-            coinCount = n;
-            initCoins();
-        },
-        restart: function () {
-            canvas.style.display = 'block';
-            for (var i = 0; i < coins.length; i++) coins[i].reset();
-            isAnimating = true;
-            animate();
-        },
-        destroy: function () {
-            isAnimating = false;
-            if (animationId) cancelAnimationFrame(animationId);
-            if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
-            var s = document.getElementById('coinFxStyle');
-            if (s && s.parentNode) s.parentNode.removeChild(s);
-        }
-    };
+                // 生成随机摇摆和旋转参数，每片人民币轨迹都不同
+                const randomSway = Math.random() * config.swayRange;
+                const rotate1 = Math.random() * config.rotateRange;
+                const rotate2 = Math.random() * config.rotateRange * 2;
+                const rotate3 = Math.random() * config.rotateRange * 3;
+
+                const money = document.createElement('div');
+                money.className = 'money';
+                // 绑定随机参数到CSS变量
+                money.style.setProperty('--x', `${point.x}px`);
+                money.style.setProperty('--y-start', `${point.y}px`);
+                money.style.setProperty('--x-end', `${endX}px`);
+                money.style.setProperty('--random-sway', `${randomSway}px`);
+                money.style.setProperty('--rotate-1', `${rotate1}deg`);
+                money.style.setProperty('--rotate-2', `${rotate2}deg`);
+                money.style.setProperty('--rotate-3', `${rotate3}deg`);
+                money.style.backgroundImage = `url(${config.imgSrc})`;
+                wrap.appendChild(money);
+
+                money.addEventListener('animationend', () => money.remove());
+                created++;
+            }
+        }, interval);
+    }
 })();
