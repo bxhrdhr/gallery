@@ -629,7 +629,8 @@ function renderFilm() {
         var d = document.createElement('div');
         d.className = 'thumb' + (i === curIdx ? ' on' : '');
         var tv = (it._sha || '').slice(0, 8);
-        d.innerHTML = '<img loading="lazy" src="' + ASSET_BASE + it.f + (tv ? '?v=' + tv : '') + '" alt="' + it.t + '"><div class="tname">' + it.t + '</div>';
+        var tf = it.f.replace('img/', 'img/thumbs/');
+        d.innerHTML = '<img loading="lazy" src="' + ASSET_BASE + tf + (tv ? '?v=' + tv : '') + '" alt="' + it.t + '"><div class="tname">' + it.t + '</div>';
         d.onclick = function () { curIdx = i; renderStage(); };
         grid.appendChild(d);
     });
