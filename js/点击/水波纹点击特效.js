@@ -22,7 +22,12 @@
     const style = document.createElement('style');
     style.innerHTML = css;
     document.head.appendChild(style);
+    var MAX_RIPPLES = 8;
     document.addEventListener('click', function(e) {
+        var all = document.querySelectorAll('.physical-water-ripple');
+        if (all.length >= MAX_RIPPLES) {
+            for (var k = 0; k <= all.length - MAX_RIPPLES; k++) if (all[k].parentNode) all[k].parentNode.removeChild(all[k]);
+        }
         const ripple = document.createElement('div');
         ripple.className = 'physical-water-ripple';
         
