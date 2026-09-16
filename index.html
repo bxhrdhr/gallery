@@ -74,13 +74,34 @@ a, button { -webkit-tap-highlight-color: transparent; }
 #album { min-height: 100dvh; padding: 18px 16px 96px; display: flex; flex-direction: column; }
 #album.enter { animation: albumIn .55s cubic-bezier(.2,.8,.3,1) both; }
 @keyframes albumIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
-.album-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.album-head { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.ah-row { display: flex; align-items: center; gap: 10px; width: 100%; }
 .back {
     border: 1px solid var(--line); background: var(--card); color: var(--ink);
     width: 40px; height: 40px; border-radius: 12px; font-size: 16px; cursor: pointer;
     flex: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
-.album-title { font-size: 15px; font-weight: 700; letter-spacing: .14em; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.album-title { font-size: 15px; font-weight: 700; letter-spacing: .14em; color: var(--ink); flex: none; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ============ 标题行长条播放器 ============ */
+.hbar {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+    height: 38px; border-radius: 19px; padding: 0 6px 0 4px;
+    background: rgba(0,0,0,.38); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(0,0,0,.16);
+}
+.hb-play, .hb-next {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(135deg,#ff9ec5,#f272a6); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(242,114,166,.45);
+}
+.hb-play svg { width: 16px; height: 16px; }
+.hb-next { background: rgba(255,255,255,.14); box-shadow: none; width: 26px; height: 26px; }
+.hb-next svg { width: 14px; height: 14px; }
+.hb-mid { flex: 1; min-width: 0; }
+.hb-name { font-size: 11px; color: #fff; letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.hb-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,.25); overflow: hidden; cursor: pointer; }
+.hb-bar i { display: block; height: 100%; width: 0; border-radius: 2px; background: linear-gradient(90deg,#ff9ec5,#f272a6); }
 .cats { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; width: 100%; padding: 4px 0; }
 .cats::-webkit-scrollbar { display: none; }
 .cat {
@@ -93,13 +114,12 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 /* 大图区 */
 .stage {
-    position: relative; width: 100%; border-radius: 20px; overflow: hidden;
+    position: relative; width: 100%; height: 52dvh; border-radius: 20px; overflow: hidden;
     background: var(--card); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 18px 44px rgba(0,0,0,.14);
-    display: flex; align-items: center; justify-content: center;
 }
-.stage-main { width: 100%; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
-#stageImg { max-width: 100%; max-height: 54dvh; object-fit: contain; display: block; }
+.stage-main { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
+#stageImg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .stage-cap {
     position: absolute; left: 12px; right: 12px; bottom: 12px;
     display: flex; align-items: center; gap: 10px;
@@ -132,53 +152,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 .thumb.empty { display: flex; align-items: center; justify-content: center; color: var(--ink2); font-size: 12px; border: 1px dashed var(--line); aspect-ratio: auto; min-height: 90px; }
 
-/* ============ 悬浮二次元播放器 ============ */
-.pfab {
-    position: fixed; right: 18px; bottom: 96px; z-index: 60;
-    width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
-    background: radial-gradient(circle at 32% 28%, #ffd9e8, #ff9ec5 60%, #f272a6);
-    box-shadow: 0 10px 26px rgba(242,114,166,.5), inset 0 2px 6px rgba(255,255,255,.6);
-    color: #fff; font-size: 22px;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .25s ease;
-}
-.pfab:active { transform: scale(.92); }
-.pfab .pulse { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(242,114,166,.6); animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(.9); opacity: .8; } 100% { transform: scale(1.25); opacity: 0; } }
-.ppanel {
-    position: fixed; right: 16px; bottom: 164px; z-index: 61;
-    width: 300px; max-width: calc(100vw - 32px);
-    background: rgba(30,24,32,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-radius: 20px; padding: 16px;
-    color: #fff; transform: translateY(12px); opacity: 0; pointer-events: none;
-    transition: all .3s ease;
-}
-.ppanel.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
-.ppanel .phead {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; color: #ffb3d1; letter-spacing: .18em; margin-bottom: 10px;
-    cursor: move; user-select: none; -webkit-user-select: none;
-    padding: 2px 0;
-}
-.ppanel .phead svg { width: 12px; height: 12px; flex: none; }
-.ppanel .phead .phint { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .1em; }
-.ppanel .pt { font-size: 12px; color: #ffb3d1; letter-spacing: .18em; margin-bottom: 10px; }
-.ppanel .pnm { font-size: 13px; color: #fff; letter-spacing: .08em; margin-bottom: 12px; min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ppanel .pbar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; margin-bottom: 14px; }
-.ppanel .pbar i { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg,#ff9ec5,#f272a6); transition: width .3s linear; }
-.ppanel .pbtns { display: flex; align-items: center; justify-content: center; gap: 30px; }
-.ppanel .pbtns button {
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 50%;
-    color: #fff; width: 40px; height: 40px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all .2s ease;
-}
-.ppanel .pbtns button:hover { background: rgba(255,255,255,.16); transform: scale(1.06); }
-.ppanel .pbtns button:active { transform: scale(.94); }
-.ppanel .pbtns button svg { width: 18px; height: 18px; }
-.ppanel .pbtns .pbig { width: 54px; height: 54px; background: linear-gradient(135deg,#ff9ec5,#f272a6); border-color: transparent; box-shadow: 0 6px 18px rgba(242,114,166,.4); }
-.ppanel .pbtns .pbig svg { width: 26px; height: 26px; }
-.pempty { font-size: 12px; color: rgba(255,255,255,.5); text-align: center; padding: 6px 0 2px; }
 
 /* ============ 灯箱 ============ */
 .lb {
@@ -212,8 +185,18 @@ a, button { -webkit-tap-highlight-color: transparent; }
 <!-- 相册页 -->
 <section id="album" class="hidden">
     <div class="album-head">
-        <button class="back" id="btnBack" type="button">‹</button>
-        <div class="album-title" id="alTitle">时光图库</div>
+        <div class="ah-row">
+            <button class="back" id="btnBack" type="button">‹</button>
+            <div class="album-title" id="alTitle">时光图库</div>
+            <div class="hbar" id="hbar">
+                <button class="hb-play" id="pPlay" type="button" aria-label="播放/暂停"><svg id="pPlayIco" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+                <div class="hb-mid">
+                    <div class="hb-name" id="pnm">暂无音乐</div>
+                    <div class="hb-bar" id="hbBar"><i id="pbar"></i></div>
+                </div>
+                <button class="hb-next" id="pNext" type="button" aria-label="下一曲"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+            </div>
+        </div>
         <div class="cats" id="catBar"></div>
     </div>
     <div class="stage" id="stageBox">
@@ -225,23 +208,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
     <div class="film-title" id="filmTitle">全部照片</div>
     <div class="film" id="filmGrid"></div>
 </section>
-
-<!-- 播放器 -->
-<button class="pfab" id="pfab" type="button" aria-label="音乐">♪<i class="pulse"></i></button>
-<div class="ppanel" id="ppanel">
-    <div class="phead" id="pHead" title="按住标题可拖动">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
-        <span>MUSIC 小站</span>
-        <span class="phint">按住拖动</span>
-    </div>
-    <div class="pnm" id="pnm">暂无音乐</div>
-    <div class="pbar"><i id="pbar"></i></div>
-    <div class="pbtns">
-        <button id="pPrev" type="button" aria-label="上一曲"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg></button>
-        <button class="pbig" id="pPlay" type="button" aria-label="播放/暂停"><svg id="pPlayIco" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-        <button id="pNext" type="button" aria-label="下一曲"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
-    </div>
-</div>
 
 <!-- 灯箱 -->
 <div class="lb" id="lb">
@@ -589,8 +555,6 @@ lb.onclick = function (e) { if (e.target === lb) lb.classList.remove('show'); };
 /* ---------- 悬浮二次元播放器 ---------- */
 /* 已禁用的音乐（后台「音乐素材库」）不播放 */
 var audio = null, mIdx = 0, mList = (C.musics || []).filter(function (m) { return !m.disabled; });
-var pfab = document.getElementById('pfab'), ppanel = document.getElementById('ppanel');
-pfab.onclick = function () { ppanel.classList.toggle('show'); };
 function mName() { return mList.length ? (mList[mIdx].name || mList[mIdx].f) : '暂无音乐'; }
 function setPIco(playing) {
     var ico = document.getElementById('pPlayIco');
@@ -627,53 +591,16 @@ function prevM() {
 }
 document.getElementById('pPlay').onclick = toggleM;
 document.getElementById('pNext').onclick = function () { nextM(false); };
-document.getElementById('pPrev').onclick = prevM;
 document.getElementById('pnm').textContent = mName();
+/* 长条播放器：点击进度条跳转 */
+document.getElementById('hbBar').onclick = function (e) {
+    if (!audio || !audio.duration) return;
+    var r = this.getBoundingClientRect();
+    var p = (e.clientX - r.left) / r.width;
+    if (p < 0) p = 0; if (p > 1) p = 1;
+    audio.currentTime = p * audio.duration;
+};
 
-/* ---- 播放器可拖动（按住标题栏拖动，记忆位置） ---- */
-(function () {
-    var panel = ppanel, hd = document.getElementById('pHead');
-    var sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
-    var saved = null;
-    try { saved = JSON.parse(localStorage.getItem('ppos') || 'null'); } catch (e) {}
-    if (saved && saved.left != null) {
-        panel.style.left = saved.left + 'px';
-        panel.style.top = saved.top + 'px';
-        panel.style.right = 'auto';
-        panel.style.bottom = 'auto';
-    }
-    function start(e) {
-        var t = e.touches ? e.touches[0] : e;
-        sx = t.clientX; sy = t.clientY;
-        var r = panel.getBoundingClientRect();
-        ox = r.left; oy = r.top;
-        dragging = true;
-        panel.classList.add('show');
-        if (e.preventDefault) e.preventDefault();
-    }
-    function mv(e) {
-        if (!dragging) return;
-        var t = e.touches ? e.touches[0] : e;
-        var nx = ox + (t.clientX - sx), ny = oy + (t.clientY - sy);
-        nx = Math.max(8, Math.min(window.innerWidth - panel.offsetWidth - 8, nx));
-        ny = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, ny));
-        panel.style.left = nx + 'px';
-        panel.style.top = ny + 'px';
-        panel.style.right = 'auto';
-        panel.style.bottom = 'auto';
-    }
-    function end() {
-        if (!dragging) return;
-        dragging = false;
-        try { localStorage.setItem('ppos', JSON.stringify({ left: panel.offsetLeft, top: panel.offsetTop })); } catch (e) {}
-    }
-    hd.addEventListener('mousedown', start);
-    hd.addEventListener('touchstart', start, { passive: false });
-    window.addEventListener('mousemove', mv);
-    window.addEventListener('touchmove', mv, { passive: false });
-    window.addEventListener('mouseup', end);
-    window.addEventListener('touchend', end);
-})();
 
 /* ---------- 特效注入 ---------- */
 function fxMount(paths) {
