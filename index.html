@@ -396,6 +396,20 @@ var CFG = {
 var ASSET_BASE = '';
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 
+/* ---------- 特效：读取后台「插件」页开关（CFG.fx）加载对应特效 ---------- */
+(function () {
+    try {
+        var fx = (typeof CFG !== 'undefined' && CFG.fx) || [];
+        for (var i = 0; i < fx.length; i++) {
+            var s = document.createElement('script');
+            s.src = (ASSET_BASE || '') + fx[i];
+            s.async = false;
+            document.body.appendChild(s);
+        }
+    } catch (e) { }
+})();
+
+
 /* ---------- 页面切换：后台可切换前台为旧站风格页面（布局用旧站，内容与时光图库同步） ---------- */
 if ((CFG.pageMode || 'gallery') === 'ksx') {
     var kf = document.createElement('div');
