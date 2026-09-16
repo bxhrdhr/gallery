@@ -9,7 +9,7 @@
     var width = window.innerWidth;
     var height = window.innerHeight;
     var flakes = [];
-    var flakeCount = 250;
+    var flakeCount = 80;
 
     canvas.id = "snow_canvas_overlay";
     canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;";
