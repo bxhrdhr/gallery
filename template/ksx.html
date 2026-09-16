@@ -1531,15 +1531,10 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
 
 <script>
 (function () {
-    var fxFiles = [
-        './js/分手时间.js',
-        './js/全屏/樱花特效.js',
-        './js/点击/水波纹点击特效.js',
-        './js/图片/图片呼吸特效.js',
-        './js/全屏/雨落特效.js',
-        './js/全屏/飞雪特效.js',
-        './js/图片/滤镜特效.js'
-    ];
+    /* 特效由后台「插件」页开关控制（CFG.fx）；本页在 template/ 下，相对上一级取 js/ */
+    var fxFiles = (typeof CFG !== 'undefined' && CFG.fx && CFG.fx.length)
+        ? CFG.fx.map(function (p) { return '../' + p; })
+        : [];
     var loaded = false;
     function injectSrc(src) {
         var s = document.createElement('script');
