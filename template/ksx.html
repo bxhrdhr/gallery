@@ -9,7 +9,7 @@ if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 function px(u) { return GHP + u.replace(/^\.\.\//, ''); }
 function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = '../' + el.src.slice(GHP.length); return true; } return false; }
-function webpFallback(el) { if (el.src.indexOf('.webp') > -1) { el.src = el.src.replace('.webp', '.jpg'); return true; } return false; }</script>
+function webpFallback() { return false; }  /* jpg 重复文件已删除，不再回退 */</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>时光图库</title>
 <meta name="description" content="一座小小的图库，收藏生活的风景与故事。">

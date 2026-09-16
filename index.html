@@ -247,7 +247,7 @@ if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 function px(u) { return GHP + u; }
 function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = el.src.slice(GHP.length); return true; } return false; }
-function webpFallback(el) { if (el.src.indexOf('.webp') > -1) { el.src = el.src.replace('.webp', '.jpg'); return true; } return false; }
+function webpFallback() { return false; }  /* jpg 重复文件已删除，不再回退 */
 
 /* ---------- 特效：读取后台「插件」页开关（CFG.fx）加载对应特效 ---------- */
 (function () {
