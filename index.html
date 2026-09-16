@@ -631,6 +631,8 @@ function renderFilm() {
         var tv = (it._sha || '').slice(0, 8);
         var tf = it.f.replace('img/', 'img/thumbs/');
         d.innerHTML = '<img loading="lazy" src="' + ASSET_BASE + tf + (tv ? '?v=' + tv : '') + '" alt="' + it.t + '"><div class="tname">' + it.t + '</div>';
+        var _im = d.querySelector('img');
+        _im.onerror = function () { if (this.src.indexOf('img/thumbs/') > -1) this.src = this.src.replace('img/thumbs/', 'img/'); };
         d.onclick = function () { curIdx = i; renderStage(); };
         grid.appendChild(d);
     });
