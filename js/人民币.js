@@ -127,7 +127,7 @@
     leafImg.src = SCRIPT_DIR + 'money.png';
 
     const leaves = [];
-    const leafCount = 120; // 减少树叶数量，降低渲染压力
+    const leafCount = 50; // 减少树叶数量，降低渲染压力
 
     function initLeaves() {
         leaves.length = 0;
