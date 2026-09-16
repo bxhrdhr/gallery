@@ -24,7 +24,7 @@ body[data-bg="aurora"] { --bg-0: linear-gradient(165deg,#0d3f46 0%,#0a2f38 55%,#
 /* 图片背景（含 GIF） */
 body.img-bg { --ink:#f6f2ea; --ink2:#cfc8bb; --card:rgba(0,0,0,.4); --line:rgba(255,255,255,.22); --accent:#f0b08a; --accent2:#e09a6f; --chip:rgba(0,0,0,.34); }
 
-.bg-layer { position: fixed; inset: 0; z-index: -2; background-size: cover; background-position: center; background-repeat: no-repeat; }
+.bg-layer { position: fixed; inset: 0; z-index: -2; background-size: auto; background-position: center top; background-repeat: no-repeat; }
 .bg-dim { position: fixed; inset: 0; z-index: -1; background: transparent; }
 
 .hidden { display: none !important; }
@@ -62,7 +62,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
     position: fixed; inset: 0; z-index: 90; pointer-events: none;
     background: var(--bg-0); opacity: 0; transform: scaleY(0); transform-origin: center;
 }
-#curtain.play { animation: curtain .85s cubic-bezier(.76,0,.24,1) forwards; }
+#curtain.play { animation: curtain .5s cubic-bezier(.76,0,.24,1) forwards; }
 @keyframes curtain {
     0%   { transform: scaleY(0);   opacity: 0; }
     38%  { transform: scaleY(1);   opacity: 1; }
@@ -72,8 +72,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 /* ============ 相册页 ============ */
 #album { min-height: 100dvh; padding: 18px 16px 96px; display: flex; flex-direction: column; }
-#album.enter { animation: albumIn .55s cubic-bezier(.2,.8,.3,1) both; }
-@keyframes albumIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+#album.enter { animation: albumIn .35s ease-out both; }
+@keyframes albumIn { from { opacity: 0; } to { opacity: 1; } }
 .album-head { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
 .ah-row { display: flex; align-items: center; gap: 10px; width: 100%; }
 .back {
@@ -310,41 +310,6 @@ var CFG = {
       "c": "life",
       "_sha": "912e5cf334a49e5acfdf3bf7d427e147b7f5836c",
       "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789530681772_28.jpg",
-      "t": "🌸",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "a7cf71ce2f09cd855c6e86cca99f3a47bd5afac2"
-    },
-    {
-      "f": "img/1789530743742_206.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "e5fab1b764b8b2a818375dfe9794e2b253e3fd2e"
-    },
-    {
-      "f": "img/1789530749315_970.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "6652f4d76d0513ccb93107afbf0aa3ce37efc4ef"
-    },
-    {
-      "f": "img/1789530753783_726.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "ec53a333b6e3de9d4eb09bb62aaaad86d5269474"
-    },
-    {
-      "f": "img/1789530759771_931.jpg",
-      "t": "深圳1日游",
-      "c": "life",
-      "date": "2026-09-16",
-      "_sha": "af368aa8eed0ba9167e654d572e7b95a006e4308"
     }
   ],
   "musics": [
