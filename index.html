@@ -595,22 +595,40 @@ function renderStage() {
     var it = list[curIdx];
     var sImg = document.getElementById('stageImg');
     sImg.style.opacity = '0';
-    sImg.onload = function () { sImg.style.transition = 'opacity .25s ease'; sImg.style.opacity = '1'; };
+    sImg.dataset.req = Date.now();
+    var req = sImg.dataset.req;
     var vv = (it._sha || '').slice(0, 8);
-    sImg.src = px(ASSET_BASE + it.f) + (vv ? '?v=' + vv : '');
-    sImg.onload = function () { if (!sImg.naturalWidth || !sImg.naturalHeight) sImg.onerror(new Event('error')); };
+    /* 阶段1：先加载缩略图（小图快、不空白），加载成功淡入显示 */
+    sImg.onload = function () {
+        if (sImg.dataset.req !== req) return;
+        if (!sImg.naturalWidth || !sImg.naturalHeight) { sImg.onerror(new Event('error')); return; }
+        sImg.style.transition = 'opacity .25s ease';
+        sImg.style.opacity = '1';
+    };
     sImg.onerror = function () {
         clearTimeout(sImg._t);
+        if (sImg.dataset.req !== req) return;
         if (!sImg.dataset.rt2 && sImg.src.indexOf(GHP) === 0) {
             sImg.dataset.rt2 = '1';
             sImg.src = sImg.src.split('&t=')[0] + '&t=' + Date.now();
-            sImg._t = setTimeout(function () { if (!sImg.complete || !sImg.naturalWidth) sImg.onerror(new Event('error')); }, 8000);
+            sImg._t = setTimeout(function () { if (sImg.dataset.req === req && (!sImg.complete || !sImg.naturalWidth)) sImg.onerror(new Event('error')); }, 8000);
             return;
         }
-        if (pxFallback(this)) { sImg._t = setTimeout(function () { if (!sImg.complete || !sImg.naturalWidth) sImg.onerror(new Event('error')); }, 8000); return; }
+        if (pxFallback(this)) { sImg._t = setTimeout(function () { if (sImg.dataset.req === req && (!sImg.complete || !sImg.naturalWidth)) sImg.onerror(new Event('error')); }, 8000); return; }
         if (this.src.indexOf('img/thumbs/') > -1) this.src = this.src.replace('img/thumbs/', 'img/');
     };
-    sImg._t = setTimeout(function () { if (!sImg.complete || !sImg.naturalWidth) sImg.onerror(new Event('error')); }, 8000);
+    sImg.src = px(ASSET_BASE + it.f.replace('img/', 'img/thumbs/')) + (vv ? '?v=' + vv : '');
+    sImg._t = setTimeout(function () { if (sImg.dataset.req === req && (!sImg.complete || !sImg.naturalWidth)) sImg.onerror(new Event('error')); }, 8000);
+    /* 阶段2：后台预载大图（原画质），成功后替换缩略图，画质升级 */
+    var hd = new Image();
+    hd.onload = function () {
+        if (sImg.dataset.req !== req) return;
+        if (!hd.naturalWidth || !hd.naturalHeight) return;
+        sImg.onload = function () { if (sImg.dataset.req === req) { sImg.style.transition = 'opacity .25s ease'; sImg.style.opacity = '1'; } };
+        sImg.src = hd.src;
+    };
+    hd.onerror = function () { /* 大图加载失败则保持缩略图显示，不空白 */ };
+    hd.src = px(ASSET_BASE + it.f) + (vv ? '?v=' + vv : '');
     document.getElementById('stageName').textContent = it.t;
     document.getElementById('stageCat').textContent = catName(it.c);
     document.getElementById('stageDate').textContent = it.date ? '上传于 ' + it.date : '';
@@ -670,6 +688,8 @@ var curtain = document.getElementById('curtain');
 var home = document.getElementById('home');
 var album = document.getElementById('album');
 function enter() {
+    /* 进入图库自动播放音乐（用户点击手势，可绕过浏览器自动播放限制） */
+    if (mList.length) { if (!audio) loadM(); if (audio.paused) { audio.play().catch(function () {}); setPIco(true); } }
     curtain.classList.remove('play');
     void curtain.offsetWidth;
     curtain.classList.add('play');
