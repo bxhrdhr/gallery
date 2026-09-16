@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="5;url=/">
 <meta name="theme-color" content="#05070d">
 <title>页面走丢了 · 时光图库</title>
 <style>
@@ -77,7 +78,7 @@ p { margin: 0 0 6px; font-size: 13px; letter-spacing: .14em; color: rgba(232,226
     <h1>这条路，走不到回忆里了</h1>
     <p>页面走丢了 · 照片还在原地</p>
     <p class="tip" id="tip">将在 <b id="cnt">5</b> 秒后自动返回主页</p>
-    <button class="go" id="go" type="button">返回主页</button>
+    <a class="go" id="go" href="/">返回主页</a>
 </main>
 
 <script>
@@ -86,7 +87,7 @@ p { margin: 0 0 6px; font-size: 13px; letter-spacing: .14em; color: rgba(232,226
     var cnt = document.getElementById('cnt');
     var left = 5;
     /* 跳到仓库根（当前站点子目录 /gallery/ 的相对路径），确保回到主页 */
-    function back() { location.replace('./'); }
+    function back() { location.replace('/'); }
     go.addEventListener('click', back);
     var t = setInterval(function () {
         left--;
