@@ -1,132 +1,196 @@
-// 人民币爱心轨迹下落 - 樱花般流畅飘落版
-// 改动说明：①图片由抖音外链改为本站资源 js/money.png（避免失效，符合本站内容要求）；②z-index 由 -1 改为 9999（否则被页面背景盖住看不到）；③图片路径按脚本所在目录自动解析
+// 落叶特效组件 - 流畅版
 (function() {
-    // 脚本所在目录（供本站图片定位）
+    'use strict';
+
+    // 1. 动态创建并插入CSS样式
+    const style = document.createElement('style');
+    style.textContent = `
+        #leafCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            pointer-events: none;
+        }
+    `;
+    if (!document.querySelector('#leafEffectStyle')) {
+        style.id = 'leafEffectStyle';
+        document.head.appendChild(style);
+    }
+
+    // 2. 创建Canvas元素
+    let canvas = document.getElementById('leafCanvas');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'leafCanvas';
+        document.body.appendChild(canvas);
+    }
+    const ctx = canvas.getContext('2d');
+    let animationId = null;
+    let isAnimating = false; // 防止重复启动动画
+
+    // 3. 高清适配 + 性能优化：防抖resize
+    let resizeTimer = null;
+    function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); // 限制最大dpr，减少计算压力
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'medium'; // 降低平滑质量，提升性能
+    }
+
+    // 防抖处理：避免resize频繁触发
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resizeCanvas, 100);
+    });
+
+    // 4. 树叶类 - 优化渐隐逻辑 + 减少冗余计算
+    class Leaf {
+        constructor(imgW, imgH) {
+            this.imgW = imgW;
+            this.imgH = imgH;
+            this.reset();
+            this.swingAmplitude = Math.random() * 8 + 3; // 减小摆动幅度，更自然
+            this.swingPhase = Math.random() * Math.PI * 2;
+            this.isLanded = false;
+        }
+
+        reset() {
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * -window.innerHeight * 0.5; // 初始位置更分散，避免扎堆
+            this.w = this.imgW * 0.2;
+            this.h = this.imgH * 0.2;
+            this.speedY = Math.random() * 1.5 + 0.8; // 速度更平缓
+            this.speedX = Math.random() * 1.2 - 0.6;
+            this.angle = Math.random() * Math.PI * 2;
+            this.rotateSpeed = Math.random() * 0.02 - 0.01; // 旋转更慢
+            this.alpha = Math.random() * 0.2 + 0.8; // 初始透明度更高
+            this.fadeThreshold = 200; // 增大渐隐触发距离，渐变更久
+            this.targetAlpha = 0; // 目标透明度，用于平滑过渡
+            this.fadeSpeed = 0.005; // 渐隐速度，越小越慢越自然
+            this.isLanded = false;
+        }
+
+        update() {
+            if (this.isLanded) return;
+
+            // 减少计算量：合并重复的三角函数计算
+            const swingOffset = Math.sin(this.swingPhase) * this.swingAmplitude * 0.04;
+            this.x += this.speedX + swingOffset;
+            this.y += this.speedY;
+            this.angle += this.rotateSpeed;
+            this.swingPhase += 0.04; // 减小步长，摆动更顺滑
+
+            // 平滑渐隐：线性过渡到目标透明度
+            const distanceToBottom = window.innerHeight - this.y;
+            if (distanceToBottom < this.fadeThreshold) {
+                this.targetAlpha = (distanceToBottom / this.fadeThreshold) * 0.8;
+                this.alpha = Math.max(this.targetAlpha, this.alpha - this.fadeSpeed);
+            }
+
+            // 完全透明或落地后标记
+            if (this.y > window.innerHeight + this.h || this.alpha <= 0) {
+                this.isLanded = true;
+            }
+        }
+
+        draw() {
+            if (this.isLanded || this.alpha <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.drawImage(leafImg, -this.w / 2, -this.h / 2, this.w, this.h);
+            ctx.restore();
+        }
+    }
+
+    // 5. 图片加载
+    // 本站图片：脚本同目录下的 money.png（由脚本 URL 自动解析，避免外链失效）
     var SCRIPT_DIR = (function () {
         var s = document.currentScript || document.scripts[document.scripts.length - 1];
         if (s && s.src) return s.src.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
         return '';
     })();
+    const leafImg = new Image();
+    leafImg.crossOrigin = 'anonymous';
+    leafImg.src = SCRIPT_DIR + 'money.png';
 
-    const style = document.createElement('style');
-    style.textContent = `
-       .money-wrap {
-             position: fixed;
-             top: 0;
-             left: 0;
-             width: 100vw;
-             height: 120vh;
-             z-index: 9999;
-             pointer-events: none;
-             overflow: hidden;
-         }
-         .money {
-            position: absolute;
-            width: 38px;
-            height: 38px;
-            background-size: 100% 100%;
-            transform: translate3d(0, 0, 0);
-            will-change: transform, opacity;
-            /* 改用樱花飘落的缓动函数，下落更轻盈 */
-            animation: loveFallSmooth 12s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            filter: blur(0px);
+    const leaves = [];
+    const leafCount = 120; // 减少树叶数量，降低渲染压力
+
+    function initLeaves() {
+        leaves.length = 0;
+        if (!leafImg.complete) return;
+        for (let i = 0; i < leafCount; i++) {
+            leaves.push(new Leaf(leafImg.width, leafImg.height));
         }
+    }
 
-        @keyframes loveFallSmooth {
-            0% {
-                transform: translate3d(var(--x), var(--y-start), 0) rotate(0deg) scale(1);
-                opacity: 1;
-                filter: blur(0px);
-            }
-            35% {
-                /* 加入左右随机摇摆偏移，模拟樱花飘动 */
-                transform: translate3d(calc(var(--x-end) + var(--random-sway)), 35vh, 0) rotate(var(--rotate-1)) scale(1);
-                opacity: 1;
-                filter: blur(0px);
-            }
-            70% {
-                transform: translate3d(calc(var(--x-end) - var(--random-sway)), 70vh, 0) rotate(var(--rotate-2)) scale(0.97);
-                opacity: 0.6;
-                filter: blur(0.5px);
-            }
-            100% {
-                transform: translate3d(calc(var(--x-end) + var(--random-sway)/2), 115vh, 0) rotate(var(--rotate-3)) scale(0.92);
-                opacity: 0;
-                filter: blur(1px);
+    // 6. 动画循环 - 性能优化：避免空转
+    function animate() {
+        if (!isAnimating) return;
+        // 批量绘制：先清屏，再统一更新绘制
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let activeCount = 0;
+        for (let i = 0; i < leaves.length; i++) {
+            const leaf = leaves[i];
+            if (!leaf.isLanded) {
+                leaf.update();
+                leaf.draw();
+                activeCount++;
             }
         }
-    `;
-    document.head.appendChild(style);
+        // 无活跃树叶时停止动画
+        if (activeCount === 0) {
+            cancelAnimationFrame(animationId);
+            canvas.style.display = 'none';
+            isAnimating = false;
+            return;
+        }
+        animationId = requestAnimationFrame(animate);
+    }
 
-    const config = {
-        imgSrc: SCRIPT_DIR + 'money.png',
-        count: 80,
-        heartSize: 180,
-        heartCenterX: window.innerWidth / 2,
-        heartCenterY: -230,
-        tMin: 0.45 * Math.PI,
-        tMax: 1.45 * Math.PI,
-        endXOffset: 10,
-        // 新增：樱花飘落的随机参数范围
-        swayRange: 20,   // 左右摇摆幅度
-        rotateRange: 15  // 旋转角度范围
+    // 7. 初始化
+    leafImg.onload = function() {
+        resizeCanvas();
+        initLeaves();
+        isAnimating = true;
+        animate();
     };
 
-    const wrap = document.createElement('div');
-    wrap.className = 'money-wrap';
-    document.body.appendChild(wrap);
+    // 初始执行
+    resizeCanvas();
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = config.imgSrc;
-    img.onload = createHeartMoney;
-    img.onerror = () => console.error('人民币图片加载失败：' + config.imgSrc);
+    // 8. 控制方法
+    window.leafEffect = {
+        setLeafCount: function(count) {
+            if (count < 20) count = 20;
+            leafCount = count;
+            initLeaves();
+        },
+        restart: function() {
+            canvas.style.display = 'block';
+            leaves.forEach(leaf => leaf.reset());
+            isAnimating = true;
+            animate();
+        },
+        destroy: function() {
+            isAnimating = false;
+            cancelAnimationFrame(animationId);
+            canvas?.parentNode?.removeChild(canvas);
+            document.getElementById('leafEffectStyle')?.parentNode?.removeChild(document.getElementById('leafEffectStyle'));
+        }
+    };
 
-    function getHeartPoint(t) {
-        const x = 16 * Math.pow(Math.sin(t), 3);
-        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-        return {
-            x: config.heartCenterX + x * (config.heartSize / 16),
-            y: config.heartCenterY + y * (config.heartSize / 16)
-        };
-    }
-
-    function createHeartMoney() {
-        let created = 0;
-        const batch = 4;
-        const interval = 220;
-        const timer = setInterval(() => {
-            for (let i = 0; i < batch; i++) {
-                if (created >= config.count) {
-                    clearInterval(timer);
-                    return;
-                }
-                const t = config.tMin + Math.random() * (config.tMax - config.tMin);
-                const point = getHeartPoint(t);
-                const endX = point.x + (Math.random() - 0.5) * config.endXOffset;
-
-                // 生成随机摇摆和旋转参数，每片人民币轨迹都不同
-                const randomSway = Math.random() * config.swayRange;
-                const rotate1 = Math.random() * config.rotateRange;
-                const rotate2 = Math.random() * config.rotateRange * 2;
-                const rotate3 = Math.random() * config.rotateRange * 3;
-
-                const money = document.createElement('div');
-                money.className = 'money';
-                // 绑定随机参数到CSS变量
-                money.style.setProperty('--x', `${point.x}px`);
-                money.style.setProperty('--y-start', `${point.y}px`);
-                money.style.setProperty('--x-end', `${endX}px`);
-                money.style.setProperty('--random-sway', `${randomSway}px`);
-                money.style.setProperty('--rotate-1', `${rotate1}deg`);
-                money.style.setProperty('--rotate-2', `${rotate2}deg`);
-                money.style.setProperty('--rotate-3', `${rotate3}deg`);
-                money.style.backgroundImage = `url(${config.imgSrc})`;
-                wrap.appendChild(money);
-
-                money.addEventListener('animationend', () => money.remove());
-                created++;
-            }
-        }, interval);
-    }
 })();
