@@ -245,7 +245,7 @@ var CFG = {
   "pageMode": "gallery",
   "uiTitle": "SHIGUANG GALLERY",
   "uiSub": "时光图库",
-  "bg": "bgbg1000241810jpg",
+  "bg": "sakura",
   "bgAuto": false,
   "bgAutoSec": 8,
   "bgs": [
@@ -352,46 +352,6 @@ var CFG = {
       "c": "life",
       "date": "2026-09-16",
       "_sha": "af368aa8eed0ba9167e654d572e7b95a006e4308"
-    },
-    {
-      "f": "img/1789535158300_254.jpg",
-      "t": "螺蛳粉",
-      "c": "food",
-      "date": "2026-09-16",
-      "_sha": "0c23f3a5fa7563626662cb34604f7560fe82bea0"
-    },
-    {
-      "f": "img/1789535166977_565.jpg",
-      "t": "1000231100",
-      "c": "food",
-      "date": "2026-09-16",
-      "_sha": "14a7d38d7f51bba59b2413c4689a86ab9daf57fd"
-    },
-    {
-      "f": "img/1789535175388_901.jpg",
-      "t": "1000220161",
-      "c": "food",
-      "date": "2026-09-16",
-      "_sha": "d7a21625332456582ff9765b7daee466ab49db9b"
-    },
-    {
-      "f": "img/1789535212103_525.jpg",
-      "t": "1000235858",
-      "c": "food",
-      "date": "2026-09-16",
-      "_sha": "8ae79b6bef62ca12b23f677e1463dbfa1f1e85e2"
-    },
-    {
-      "f": "img/1789535284073_334.jpg",
-      "t": "1000231528",
-      "c": "food",
-      "date": "2026-09-16"
-    },
-    {
-      "f": "img/1789535296235_355.jpg",
-      "t": "1000224726",
-      "c": "food",
-      "date": "2026-09-16"
     }
   ],
   "musics": [
@@ -421,7 +381,8 @@ var CFG = {
     "js/点击/水波纹点击特效.js",
     "js/图片/滤镜特效.js",
     "js/全屏/飞雪特效.js",
-    "js/图片/图片呼吸特效.js"
+    "js/图片/图片呼吸特效.js",
+    "js/人民币.js"
   ],
   "tplBg": "tplbmu3f6mvv1",
   "tplBgAuto": false,
@@ -588,6 +549,8 @@ function renderStage() {
     document.getElementById('stageDate').textContent = it.date ? '上传于 ' + it.date : '';
     document.getElementById('stagePrev').style.display = list.length > 1 ? '' : 'none';
     document.getElementById('stageNext').style.display = list.length > 1 ? '' : 'none';
+    var pre = new Image();
+    pre.src = ASSET_BASE + list[(curIdx + 1) % list.length].f;
     var thumbs = document.querySelectorAll('.thumb');
     for (var i = 0; i < thumbs.length; i++) {
         thumbs[i].classList.toggle('on', i === curIdx);
