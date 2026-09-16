@@ -1426,9 +1426,14 @@ const showImage = (index, dir) => {
         };
 
         img.onerror = () => {
-            w.classList.remove('loaded');
-            w.classList.add('error');
-            img.removeAttribute('src');
+            if (!w.dataset.fb && img.src.indexOf('img/thumbs/') > -1) {
+                w.dataset.fb = '1';
+                img.src = img.src.replace('img/thumbs/', 'img/');
+            } else {
+                w.classList.remove('loaded');
+                w.classList.add('error');
+                img.removeAttribute('src');
+            }
         };
 
         w.onclick = (e) => {
