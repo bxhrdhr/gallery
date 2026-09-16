@@ -7,12 +7,8 @@ var CFG = {"name": "时光图库", "intro": "一座小小的图库，收藏生�
 if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 /* 图片双通道加速：gh-proxy + 失败自动回退本站 */
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
-function px(u) { return u; }
-function pxFallback(el) {
-    if (el.src.indexOf(GHP) === 0) return false;
-    el.src = GHP + el.src.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
-    return true;
-}
+function px(u) { return GHP + u.replace(/^\.\.\//, ''); }
+function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = '../' + el.src.slice(GHP.length); return true; } return false; }
 function webpFallback(el) { if (el.src.indexOf('.webp') > -1) { el.src = el.src.replace('.webp', '.jpg'); return true; } return false; }</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>时光图库</title>
@@ -139,6 +135,7 @@ body {
     .header { padding: 50px 20px 40px; }
     .subtitle { font-size: 24px; }
     #c { 
+        max-width: 1500px; margin: 0 auto;
         grid-template-columns: repeat(var(--col-pc-default), 1fr); 
         gap: 16px; padding: 0 40px 120px;
     }
@@ -623,6 +620,13 @@ body.intro-lock { overflow: hidden; }
     .intro-cta { padding: 13px 38px 13px 44px; font-size: 15px; }
 }
 
+/* 顶部大图 */
+.stage2{position:relative;width:100%;margin:14px auto 18px;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:rgba(18,24,36,.35)}
+.stage2 img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;opacity:0;transition:opacity .4s ease}
+.stage2-bar{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:26px 14px 10px;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:13px;letter-spacing:.05em}
+.stage2-bar span:first-child{text-shadow:0 1px 3px rgba(0,0,0,.8);font-weight:600}
+.stage2-bar span:last-child{opacity:.85}
+@media (min-width:768px){.stage2{max-width:1200px;margin:20px auto 24px}}
 </style>
 
 
@@ -656,6 +660,13 @@ body.intro-lock { overflow: hidden; }
     <div class="subtitle">时光图库</div>
 </div>
 <div class="catbar" id="catbar"></div>
+<div class="stage2" id="stage2">
+  <img id="stage2Img" alt="" draggable="false">
+  <div class="stage2-bar">
+    <span id="stage2Name"></span>
+    <span id="stage2Count"></span>
+  </div>
+</div>
 <div id="c"></div>
 <div id="v"><img><div class="v-date" id="vDate"></div></div>
 <div class="t"></div>
@@ -707,6 +718,7 @@ body.intro-lock { overflow: hidden; }
     const rawImageFiles = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.f; });
     const rawImageShas  = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it._sha || ''; });
     const rawImageCats = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.c || ''; });
+    const rawImageTitles = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.t || ''; });
     const rawImageDates = (CFG.imgs || []).filter(function (it) { return !it.disabled; }).map(function (it) { return it.date || ''; });
 
 
@@ -715,6 +727,7 @@ body.intro-lock { overflow: hidden; }
 
     let imageFiles = rawImageFiles.slice();
     let imageDates = rawImageDates.slice();
+    let imageTitles = rawImageTitles.slice();
 
     /* ---- 分类：优先用时光图库后台的分类（内容同步）；无分类时按文件名自动分组 ---- */
     let curCat = 'all';
@@ -773,8 +786,9 @@ body.intro-lock { overflow: hidden; }
                 curCat = cc.id;
                 imageFiles = [];
                 imageDates = [];
+                imageTitles = [];
                 for (var i = 0; i < rawImageFiles.length; i++) {
-                    if (curCat === 'all' || catOf(rawImageFiles[i], i) === curCat) { imageFiles.push(rawImageFiles[i]); imageDates.push(rawImageDates[i]); }
+                    if (curCat === 'all' || catOf(rawImageFiles[i], i) === curCat) { imageFiles.push(rawImageFiles[i]); imageDates.push(rawImageDates[i]); imageTitles.push(rawImageTitles[i]); }
                 }
                 var container = document.getElementById('c');
                 container.innerHTML = '';
@@ -782,6 +796,7 @@ body.intro-lock { overflow: hidden; }
                 if (v) { v.style.display = 'none'; document.body.style.overflow = ''; }
                 closeCatMenu();
                 renderCatMenu();
+                stageIdx = 0; renderStage2();
             };
             cm.appendChild(b);
         });
@@ -1124,6 +1139,63 @@ const showImage = (index, dir) => {
     preloadImage(index - 1);
 };
 
+    /* ===== 顶部大图：当前照片 + 滑动切换（点小图联动 / 点大图全屏） ===== */
+    let stageIdx = 0;
+    const stage2El = document.getElementById('stage2');
+    const stage2Img = document.getElementById('stage2Img');
+    const stage2Name = document.getElementById('stage2Name');
+    const stage2Count = document.getElementById('stage2Count');
+    function renderStage2() {
+        if (!imageFiles.length) { if (stage2El) stage2El.style.display = 'none'; return; }
+        if (stage2El) stage2El.style.display = '';
+        if (stageIdx >= imageFiles.length) stageIdx = 0;
+        if (stageIdx < 0) stageIdx = imageFiles.length - 1;
+        const f = imageFiles[stageIdx];
+        const _sha8 = (rawImageShas[stageIdx] || '').slice(0, 8);
+        stage2Img.dataset.f = f;
+        stage2Img.style.opacity = '0';
+        stage2Img.src = px(ASSET_BASE + f.replace('img/', 'img/thumbs/')) + (_sha8 ? '?v=' + _sha8 : '');
+        stage2Img.onload = () => {
+            if (stage2Img.dataset.f !== f) return;
+            stage2Img.style.opacity = '1';
+            var _b2 = new Image();
+            _b2.onload = function () { if (stage2Img.dataset.f === f) stage2Img.src = px(ASSET_BASE + f) + (_sha8 ? '?v=' + _sha8 : ''); };
+            _b2.onerror = function () { if (!_b2.dataset.fb) { _b2.dataset.fb = '1'; if (!webpFallback(_b2)) pxFallback(_b2); } };
+            _b2.src = px(ASSET_BASE + f) + (_sha8 ? '?v=' + _sha8 : '');
+        };
+        stage2Img.onerror = () => {
+            clearTimeout(stage2Img._t);
+            if (webpFallback(stage2Img)) { stage2Img._t = setTimeout(function () { if (!stage2Img.complete || !stage2Img.naturalWidth) stage2Img.onerror(new Event('error')); }, 8000); return; }
+            if (pxFallback(stage2Img)) { stage2Img._t = setTimeout(function () { if (!stage2Img.complete || !stage2Img.naturalWidth) stage2Img.onerror(new Event('error')); }, 8000); return; }
+            stage2Img.style.opacity = '1';
+        };
+        stage2Img._t = setTimeout(function () { if (!stage2Img.complete || !stage2Img.naturalWidth) stage2Img.onerror(new Event('error')); }, 8000);
+        stage2Name.textContent = (imageTitles && imageTitles[stageIdx]) || '';
+        stage2Count.textContent = (stageIdx + 1) + ' / ' + imageFiles.length;
+    }
+    (function () {
+        if (!stage2El) return;
+        var sx = 0, sy = 0, swiped = false;
+        stage2El.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; swiped = false; }, { passive: true });
+        stage2El.addEventListener('touchmove', function (e) {
+            var dx = e.touches[0].clientX - sx, dy = e.touches[0].clientY - sy;
+            if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) swiped = true;
+        }, { passive: true });
+        stage2El.addEventListener('touchend', function (e) {
+            if (!swiped) return;
+            var dx = e.changedTouches[0].clientX - sx;
+            if (!imageFiles.length) return;
+            if (dx < -40) stageIdx++; else if (dx > 40) stageIdx--;
+            if (stageIdx >= imageFiles.length) stageIdx = 0;
+            if (stageIdx < 0) stageIdx = imageFiles.length - 1;
+            renderStage2();
+        }, { passive: true });
+        stage2El.addEventListener('click', function () {
+            if (swiped) { swiped = false; return; }
+            if (imageFiles.length) showImage(stageIdx, 'none');
+        });
+    })();
+
     let startY = 0;
     let startTime = 0;
 
@@ -1196,6 +1268,8 @@ const showImage = (index, dir) => {
             w.classList.remove('error', 'loaded');
             img.src = px(ASSET_BASE + fileName.replace('img/', 'img/thumbs/')) + '?v=' + (rawImageShas[globalIndex] || '').slice(0, 8) + (w.dataset.retry ? '&t=' + Date.now() : '');
             w.dataset.retry = 'true';
+            clearTimeout(img._t);
+            img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000);
         };
 
         img.onload = () => {
@@ -1204,8 +1278,9 @@ const showImage = (index, dir) => {
         };
 
         img.onerror = () => {
-            if (webpFallback(img)) { return; }
-            if (pxFallback(img)) { return; }
+            clearTimeout(img._t);
+            if (webpFallback(img)) { img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000); return; }
+            if (pxFallback(img)) { img._t = setTimeout(() => { if (!img.complete || !img.naturalWidth) img.onerror(new Event('error')); }, 8000); return; }
             if (!w.dataset.fb && img.src.indexOf('img/thumbs/') > -1) {
                 w.dataset.fb = '1';
                 img.src = img.src.replace('img/thumbs/', 'img/');
@@ -1222,6 +1297,7 @@ const showImage = (index, dir) => {
                 if (u.paused && !mp) { if(!inited) initAudio(); u.play().catch(() => {}); }
                 history.pushState({modal: true}, null, '');
                 document.body.style.overflow = 'hidden';
+                stageIdx = globalIndex; renderStage2();
                 showImage(globalIndex, 'none');
             } else if (w.classList.contains('error')) {
                 w.loadImg();
@@ -1242,6 +1318,7 @@ const showImage = (index, dir) => {
 };
 renderAllPerfectly();
 renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里 */
+renderStage2();
 
     /* ---- 旧站模板背景：读 CFG.tplBg / CFG.tplBgs（后台「背景」页「旧站模板背景」区块管理，与时光图库背景相互独立） ---- */
     function applyBgTpl() {

@@ -245,12 +245,8 @@ var CFG = {"name": "时光图库", "intro": "一座小小的图库，收藏生�
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 /* 图片双通道加速：gh-proxy（参考站同款加速）+ 失败自动回退本站域名 */
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
-function px(u) { return u; }
-function pxFallback(el) {
-    if (el.src.indexOf(GHP) === 0) return false;
-    el.src = GHP + el.src.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
-    return true;
-}
+function px(u) { return GHP + u; }
+function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = el.src.slice(GHP.length); return true; } return false; }
 function webpFallback(el) { if (el.src.indexOf('.webp') > -1) { el.src = el.src.replace('.webp', '.jpg'); return true; } return false; }
 
 /* ---------- 特效：读取后台「插件」页开关（CFG.fx）加载对应特效 ---------- */
@@ -369,6 +365,7 @@ function renderStage() {
     var vv = (it._sha || '').slice(0, 8);
     sImg.src = px(ASSET_BASE + it.f) + (vv ? '?v=' + vv : '');
     sImg.onerror = function () { if (!webpFallback(this)) pxFallback(this); };
+    sImg._t = setTimeout(function () { if (!sImg.complete || !sImg.naturalWidth) sImg.onerror(new Event('error')); }, 8000);
     document.getElementById('stageName').textContent = it.t;
     document.getElementById('stageCat').textContent = catName(it.c);
     document.getElementById('stageDate').textContent = it.date ? '上传于 ' + it.date : '';
@@ -402,10 +399,12 @@ function renderFilm() {
         d.innerHTML = '<img loading="lazy" src="' + px(ASSET_BASE + tf) + (tv ? '?v=' + tv : '') + '" alt="' + it.t + '"><div class="tname">' + it.t + '</div>';
         var _im = d.querySelector('img');
         _im.onerror = function () {
-            if (webpFallback(this)) { return; }
-            if (pxFallback(this)) { return; }
+            clearTimeout(_im._t);
+            if (webpFallback(this)) { _im._t = setTimeout(function () { if (!_im.complete || !_im.naturalWidth) _im.onerror(new Event('error')); }, 8000); return; }
+            if (pxFallback(this)) { _im._t = setTimeout(function () { if (!_im.complete || !_im.naturalWidth) _im.onerror(new Event('error')); }, 8000); return; }
             if (this.src.indexOf('img/thumbs/') > -1) this.src = this.src.replace('img/thumbs/', 'img/');
         };
+        _im._t = setTimeout(function () { if (!_im.complete || !_im.naturalWidth) _im.onerror(new Event('error')); }, 8000);
         /* 预加载对应大图：浏览时后台拉好，点击放大秒开 */
         var _pl = new Image(); _pl.src = px(ASSET_BASE + it.f) + (tv ? '?v=' + tv : '');
         d.onclick = function () { curIdx = i; renderStage(); };
