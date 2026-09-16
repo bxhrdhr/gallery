@@ -10,7 +10,7 @@
             box-shadow: inset 0 0 20px rgba(255,255,255,0.5), 0 0 15px rgba(255,255,255,0.3);
             transform: translate(-50%, -50%);
             animation: ripple-anim 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            z-index: 2147483647;
+            z-index: 5;
         }
         @keyframes ripple-anim {
             0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.8; }
