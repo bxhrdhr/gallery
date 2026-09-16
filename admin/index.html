@@ -526,13 +526,32 @@ document.getElementById('upFiles').onchange = function () {
         var fn = 'img/' + Date.now() + '_' + Math.floor(Math.random() * 999) + '.' + ext;
         var rd = new FileReader();
         rd.onload = function () {
-            api('/contents/' + fn, 'PUT', { message: 'Up ' + fn, content: rd.result.split(',')[1] }).then(function () {
-                cfg.imgs.push({ f: fn, t: f.name.replace(/\.[^.]+$/, ''), c: cat, date: new Date().toISOString().slice(0, 10) });
-                i++;
-                msg('上传中 ' + i + '/' + files.length);
-                if (i === files.length) {
-                    saveIdx(function () { msg('上传完成'); renderGrid(); });
-                } else next();
+            var fullB64 = rd.result.split(',')[1];
+            var thumbPath = 'img/thumbs/' + fn.split('/')[1];
+            api('/contents/' + fn, 'PUT', { message: 'Up ' + fn, content: fullB64 }).then(function () {
+                /* 生成缩略图（400px, jpeg q70）并上传，保证网格加载小图 */
+                var im = new Image();
+                im.onload = function () {
+                    var MAXW = 400, w = im.width, h = im.height;
+                    if (w > MAXW) { h = Math.round(h * MAXW / w); w = MAXW; }
+                    var cv = document.createElement('canvas');
+                    cv.width = w; cv.height = h;
+                    cv.getContext('2d').drawImage(im, 0, 0, w, h);
+                    var tb = cv.toDataURL('image/jpeg', 0.7).split(',')[1];
+                    api('/contents/' + thumbPath, 'PUT', { message: 'Up thumb', content: tb }).then(function () {
+                        done();
+                    }).catch(function () { done(); });
+                };
+                im.onerror = function () { done(); };
+                im.src = rd.result;
+                function done() {
+                    cfg.imgs.push({ f: fn, t: f.name.replace(/\.[^.]+$/, ''), c: cat, date: new Date().toISOString().slice(0, 10) });
+                    i++;
+                    msg('上传中 ' + i + '/' + files.length);
+                    if (i === files.length) {
+                        saveIdx(function () { msg('上传完成'); renderGrid(); });
+                    } else next();
+                }
             }).catch(function () { msg('上传失败'); });
         };
         rd.readAsDataURL(f);
