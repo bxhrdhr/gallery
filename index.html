@@ -245,8 +245,12 @@ var CFG = {"name": "时光图库", "intro": "一座小小的图库，收藏生�
 if (ASSET_BASE && ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 /* 图片双通道加速：gh-proxy（参考站同款加速）+ 失败自动回退本站域名 */
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
-function px(u) { return GHP + u; }
-function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = el.src.slice(GHP.length); return true; } return false; }
+function px(u) { return u; }
+function pxFallback(el) {
+    if (el.src.indexOf(GHP) === 0) return false;
+    el.src = GHP + el.src.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+    return true;
+}
 
 /* ---------- 特效：读取后台「插件」页开关（CFG.fx）加载对应特效 ---------- */
 (function () {
@@ -397,7 +401,7 @@ function renderFilm() {
         d.innerHTML = '<img loading="lazy" src="' + px(ASSET_BASE + tf) + (tv ? '?v=' + tv : '') + '" alt="' + it.t + '"><div class="tname">' + it.t + '</div>';
         var _im = d.querySelector('img');
         _im.onerror = function () {
-            if (pxFallback(this)) { this.src += (tv ? '?v=' + tv : ''); return; }
+            if (pxFallback(this)) { return; }
             if (this.src.indexOf('img/thumbs/') > -1) this.src = this.src.replace('img/thumbs/', 'img/');
         };
         /* 预加载对应大图：浏览时后台拉好，点击放大秒开 */
@@ -448,7 +452,7 @@ function showLb() {
     _lb.src = px(ASSET_BASE + it.f.replace('img/', 'img/thumbs/')) + (_v ? '?v=' + _v : '');
     var _bi = new Image();
     _bi.onload = function () { _lb.src = px(ASSET_BASE + it.f) + (_v ? '?v=' + _v : ''); };
-    _bi.onerror = function () { if (!_bi.dataset.fb) { _bi.dataset.fb = '1'; _bi.src = ASSET_BASE + it.f + (_v ? '?v=' + _v : ''); } };
+    _bi.onerror = function () { if (!_bi.dataset.fb) { _bi.dataset.fb = '1'; pxFallback(_bi); } };
     _bi.src = px(ASSET_BASE + it.f) + (_v ? '?v=' + _v : '');
     document.getElementById('lbName').textContent = it.t + (catName(it.c) ? ' · ' + catName(it.c) : '');
     lb.classList.add('show');
