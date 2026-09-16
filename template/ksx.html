@@ -8,7 +8,11 @@ if (ASSET_BASE.slice(-1) !== '/') ASSET_BASE += '/';
 /* 图片双通道加速：gh-proxy + 失败自动回退本站 */
 var GHP = 'https://gh-proxy.org/https://raw.githubusercontent.com/bxhrdhr/gallery/main/';
 function px(u) { return GHP + u.replace(/^\.\.\//, ''); }
-function pxFallback(el) { if (el.src.indexOf(GHP) === 0) { el.src = el.src.slice(GHP.length); return true; } return false; }</script>
+function pxFallback(el) {
+    if (el.src.indexOf(GHP) === 0) return false;
+    el.src = GHP + el.src.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+    return true;
+}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>时光图库</title>
 <meta name="description" content="一座小小的图库，收藏生活的风景与故事。">
