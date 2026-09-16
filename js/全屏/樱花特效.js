@@ -122,7 +122,7 @@ case 'fnr':
             cxt;
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
-        canvas.setAttribute('style', 'position: fixed;left: 0;top: 0;pointer-events: none;');
+        canvas.setAttribute('style', 'position: fixed;left: 0;top: 0;pointer-events: none; z-index: 5;');
         canvas.setAttribute('id', 'canvas_sakura');
         document.getElementsByTagName('body')[0].appendChild(canvas);
         cxt = canvas.getContext('2d');
