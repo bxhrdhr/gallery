@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<!-- 雨滴特效由后台「背景 → 旧站模板背景 → 雨滴特效」开关控制（CFG.tplRain），由主脚本按需加载 -->
 <script>/* 站点配置（与前台 index.html 同一份，后台「保存」会同时同步这里 —— 页面切换模板内容与时光图库同步） */
 var CFG = {
   "name": "时光图库",
@@ -758,13 +757,10 @@ body.intro-lock { overflow: hidden; }
 <body>
 <style>
 /* 背景层：容器由后台「插件 → 背景插件」控制，存在即显示；底色半透明以便透出下层页面背景 */
-#glass-rain{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:rgba(5,7,13,.42)}
 #glass-rain .gr-deps{display:none}
-#glass-rain #container{position:absolute;top:0;left:0;display:block}
 /* 页面背景（后台「背景」页管理：渐变/图片/动图） */
 #bgTpl{position:fixed;inset:0;z-index:-2;pointer-events:none;background-size:cover;background-position:center;background-repeat:no-repeat;transition:background .5s ease}
 /* 玻璃雨珠容器强制透明：只留雨滴，页面背景（#bgTpl）永远不被盖住 */
-#glass-rain,#glass-rain-canvas{background:transparent!important}
 </style>
 <!-- ===== 开场：星夜回忆 ===== -->
 <div id="intro" class="intro">
@@ -1571,15 +1567,6 @@ renderCatMenu();   /* 页面切换模板：分类/音乐都在三条杠菜单里
     }
 })();
 </script>
-<!-- 玻璃雨珠（背景层）由后台「插件 → 背景插件」开关控制：
-     开启时后台把下面的容器与脚本标签整段插入本页，关闭时整段移除。
-     源码在 js/玻璃雨珠/，其纹理按本页路径相对解析（js/玻璃雨珠/data-img/…），
-     所以把整站下载到本地同样能正常显示。 -->
-<!-- 背景容器（占位）：引入脚本已提到 <head> 顶部优先加载；万一 js 没加载出来，这层还兜底色 -->
-<div id="glass-rain" aria-hidden="true">
-    <canvas id="container"></canvas>
-    <div class="gr-deps">
-        <div class="slide slide--current" id="slide-1" data-weather="rain"></div>
         <a href="#slide-1"></a>
     </div>
 </div>
