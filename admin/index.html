@@ -260,6 +260,8 @@ textarea { min-height:80px; line-height:1.6; resize:vertical; }
         <input type="text" id="set-404-go">
         <div class="lbl">底部提示</div>
         <input type="text" id="set-404-hint">
+        <div class="lbl">跳转地址（默认 / 主页）</div>
+        <input type="text" id="set-404-url" placeholder="/">
         <div class="btn-row"><button class="btn primary" id="btnSave404" type="button">保存404文字</button></div>
     </div>
 </div>
@@ -947,8 +949,10 @@ function fill404() {
     m = f404.match(/<title>([\s\S]*?)<\/title>/); if (m) document.getElementById('set-404-title').value = m[1];
     m = f404.match(/<h1 class="t">([\s\S]*?)<\/h1>/); if (m) document.getElementById('set-404-t').value = m[1];
     m = f404.match(/<p class="s">([\s\S]*?)<\/p>/); if (m) document.getElementById('set-404-s').value = m[1];
-    m = f404.match(/<button id="go"[^>]*>([\s\S]*?)<\/button>/); if (m) document.getElementById('set-404-go').value = m[1];
+    m = f404.match(/<a id="go"[^>]*>([\s\S]*?)<\/a>/); if (m) document.getElementById('set-404-go').value = m[1];
     m = f404.match(/<p class="hint">([\s\S]*?)<\/p>/); if (m) document.getElementById('set-404-hint').value = m[1];
+    /* 读取跳转地址 */
+    m = f404.match(/<a id="go"[^>]*href="([^"]*)"/); if (m) document.getElementById('set-404-url').value = m[1];
 }
 document.getElementById('btnSave404').onclick = function () {
     if (!f404) return msg('404 文件未加载');
@@ -957,8 +961,12 @@ document.getElementById('btnSave404').onclick = function () {
     rep(/(<title>)[\s\S]*?(<\/title>)/, document.getElementById('set-404-title').value.trim());
     rep(/(<h1 class="t">)[\s\S]*?(<\/h1>)/, document.getElementById('set-404-t').value.trim());
     rep(/(<p class="s">)[\s\S]*?(<\/p>)/, document.getElementById('set-404-s').value.trim());
-    rep(/(<button id="go"[^>]*>)[\s\S]*?(<\/button>)/, document.getElementById('set-404-go').value.trim());
+    rep(/(<a id="go"[^>]*>)[\s\S]*?(<\/a>)/, document.getElementById('set-404-go').value.trim());
     rep(/(<p class="hint">)[\s\S]*?(<\/p>)/, document.getElementById('set-404-hint').value.trim());
+    /* 保存跳转地址：替换 href，同时同步 meta refresh 的 url */
+    var url = document.getElementById('set-404-url').value.trim() || '/';
+    n = n.replace(/(<a id="go"[^>]*href=")[^"]*(")/, function (m, a, b) { return a + url + b; });
+    n = n.replace(/(http-equiv="refresh"[^>]*url=)[^" >]*/, function (m, a) { return a + url; });
     api('/contents/404.html', 'PUT', { message: 'Update 404', content: bE(n), sha: sha404 }).then(function (r) {
         sha404 = r.content.sha; f404 = n;
         msg('404 文字已保存');
